@@ -480,10 +480,22 @@ class PullData
       $plan = new PurchasePlan();
     }
 
+    // Создаем/обновляем план
     $plan->updatePlan($xml);
     $this->entityManager->persist($plan);
+
+    // Удаляем все позиции и создаем их заново
+    $planitems = $plan->getPlanitems();
+
+    foreach ($planitems as $item) {
+      $this->entityManager->remove($item);
+    }
     $this->entityManager->flush();
 
+    $plan->updatePlanItems($xml['ns2:purchasePlanItems']);
+    $this->entityManager->persist($plan);
+
+    $this->entityManager->flush();
   }
 
 }

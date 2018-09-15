@@ -24,11 +24,7 @@ class EntityBase
     foreach ($entity as $name => $val) {
       $ind = strtolower(str_replace('ns2:', '', $name));
       $fun = 'set' . ucfirst($ind);
-      if (function_exists($this->$fun($entity[$name]))){
-        $this->$fun($entity[$name]);
-      } else {
-        // TODO Сделать логирование ошибки
-      }
+      $this->$fun($entity[$name]);
     }
   }
 
@@ -39,8 +35,14 @@ class EntityBase
    */
   public function updatePlan($plan)
   {
+    $excludeFields = ['purchaseplanitems', 'purchaseplanitemssmb', 'attachments'];
+
     foreach ($plan as $name => $val) {
       $ind = strtolower(str_replace('ns2:', '', $name));
+
+      if (in_array($ind, $excludeFields)) {
+        continue;
+      }
 
       if ($ind === 'urloos') {
         $ind = 'urleis';
@@ -74,37 +76,9 @@ class EntityBase
 
         $this->setPlacer($placer);
 
-      } elseif ($ind === 'purchaseplanitems') {
-
-        // TODO Или полное удаление всей коллекции и как то пытаться найти и обновить
-        $planitems = $this->getPlanitems();
-        $planitems->clear();
-
-        foreach ($plan['ns2:purchasePlanItems'] as $data) {
-          if (!empty($data[0])) {
-            foreach ($data as $row) {
-              $item = new PurchasePlanItems();
-              $item->updatePlanItem($row);
-              $this->setPlanitems($item);
-            }
-          } else {
-            $item = new PurchasePlanItems();
-            $item->updatePlanItem($data);
-            $this->setPlanitems($item);
-          }
-        }
-
-      } elseif ($ind === 'purchaseplanitemssmb') {
-
-      } elseif ($ind === 'attachments') {
-
       } else {
         $fun = 'set' . ucfirst($ind);
-        if (function_exists($this->$fun($plan[$name]))) {
-          $this->$fun($plan[$name]);
-        } else {
-          // TODO Сделать логирование ошибки
-        }
+        $this->$fun($plan[$name]);
       }
     }
   }
@@ -114,27 +88,50 @@ class EntityBase
    *
    * @param $planitems
    */
-  public function updatePlanItem($item) {
+  public function updatePlanItems($items) {
 
-      foreach ($item as $nameItem => $itm) {
-        $indItem = strtolower(str_replace('ns2:', '', $nameItem));
-
-        if ($indItem === 'purchaseplandataitemrows') {
-
-        } elseif ($indItem === 'currency') {
-
-        } elseif ($indItem === 'planitemcustomer') {
-
-        } else {
-          $fun = 'set' . ucfirst($indItem);
-
-          if (function_exists($this->$fun($item[$nameItem]))) {
-            $this->$fun($item[$nameItem]);
-          } else {
-            // TODO Сделать логирование ошибки
-          }
+    foreach ($items as $data) {
+      if (!empty($data[0])) {
+        foreach ($data as $row) {
+          $item = new PurchasePlanItems();
+          $item->updateItem($row);
+          $item->setPlanid($this);
+          $this->setPlanitems($item);
         }
+      } else {
+        $item = new PurchasePlanItems();
+        $item->updateItem($data);
+        $item->setPlanid($this);
+        $this->setPlanitems($item);
+      }
+    }
+  }
+
+  /**
+   * @param $item
+   */
+  public function updateItem($item)
+  {
+    $excludeFields = ['changedgwsanddates', 'changednmskmoretenpercent', 'otherchanges', 'longterm', 'longtermvolumes', 'longtermsmbvolumes',
+      'initialpositionid', 'purchaseplanneddate', 'purchasecategory', 'initialpositiondata'];
+
+    foreach ($item as $nameItem => $itm) {
+      $indItem = strtolower(str_replace('ns2:', '', $nameItem));
+
+      if (in_array($indItem, $excludeFields)) {
+        continue;
       }
 
+      if ($indItem === 'purchaseplandataitemrows') {
+
+      } elseif ($indItem === 'currency') {
+
+      } elseif ($indItem === 'planitemcustomer') {
+
+      } else {
+        $fun = 'set' . ucfirst($indItem);
+        $this->$fun($item[$nameItem]);
+      }
+    }
   }
 }

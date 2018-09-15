@@ -26,7 +26,7 @@ class PurchasePlan extends EntityBase
 {
 
   /**
-   * @ORM\OneToMany(targetEntity="\Application\Entity\PurchasePlanItems", mappedBy="plan")
+   * @ORM\OneToMany(targetEntity="\Application\Entity\PurchasePlanItems", mappedBy="plan", cascade={"persist"})
    * @ORM\JoinColumn(name="id", referencedColumnName="planid")
    */
   private $planitems;
