@@ -26,7 +26,7 @@ class PurchasePlan extends EntityBase
 {
 
   /**
-   * @ORM\OneToMany(targetEntity="\Application\Entity\PurchasePlanItems", mappedBy="planid", cascade={"persist"})
+   * @ORM\OneToMany(targetEntity="\Application\Entity\PurchasePlanItems", mappedBy="plan")
    * @ORM\JoinColumn(name="id", referencedColumnName="planid")
    */
   private $planitems;
@@ -1081,6 +1081,29 @@ class PurchasePlan extends EntityBase
   public function getPlacer()
   {
     return $this->placer;
+  }
+
+  /**
+   * Получаем коллекцию позиций плана
+   *
+   * @return ArrayCollection
+   */
+  public function getPlanitems()
+  {
+    return $this->planitems;
+  }
+
+  /**
+   * Добавляем в коллекцию позицию
+   *
+   * @param PurchasePlanItems|null $planitems
+   * @return $this
+   */
+  public function setPlanitems(\Application\Entity\PurchasePlanItems $planitems = null)
+  {
+    $this->planitems[] = $planitems;
+
+    return $this;
   }
 
 }

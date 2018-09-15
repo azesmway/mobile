@@ -24,7 +24,11 @@ class EntityBase
     foreach ($entity as $name => $val) {
       $ind = strtolower(str_replace('ns2:', '', $name));
       $fun = 'set' . ucfirst($ind);
-      $this->$fun($entity[$name]);
+      if (function_exists($this->$fun($entity[$name]))){
+        $this->$fun($entity[$name]);
+      } else {
+        // TODO Сделать логирование ошибки
+      }
     }
   }
 
@@ -72,14 +76,65 @@ class EntityBase
 
       } elseif ($ind === 'purchaseplanitems') {
 
+        // TODO Или полное удаление всей коллекции и как то пытаться найти и обновить
+        $planitems = $this->getPlanitems();
+        $planitems->clear();
+
+        foreach ($plan['ns2:purchasePlanItems'] as $data) {
+          if (!empty($data[0])) {
+            foreach ($data as $row) {
+              $item = new PurchasePlanItems();
+              $item->updatePlanItem($row);
+              $this->setPlanitems($item);
+            }
+          } else {
+            $item = new PurchasePlanItems();
+            $item->updatePlanItem($data);
+            $this->setPlanitems($item);
+          }
+        }
+
       } elseif ($ind === 'purchaseplanitemssmb') {
 
       } elseif ($ind === 'attachments') {
 
       } else {
         $fun = 'set' . ucfirst($ind);
-        $this->$fun($plan[$name]);
+        if (function_exists($this->$fun($plan[$name]))) {
+          $this->$fun($plan[$name]);
+        } else {
+          // TODO Сделать логирование ошибки
+        }
       }
     }
+  }
+
+  /**
+   * Обновляем данные в сущности PurchasePlanItems
+   *
+   * @param $planitems
+   */
+  public function updatePlanItem($item) {
+
+      foreach ($item as $nameItem => $itm) {
+        $indItem = strtolower(str_replace('ns2:', '', $nameItem));
+
+        if ($indItem === 'purchaseplandataitemrows') {
+
+        } elseif ($indItem === 'currency') {
+
+        } elseif ($indItem === 'planitemcustomer') {
+
+        } else {
+          $fun = 'set' . ucfirst($indItem);
+
+          if (function_exists($this->$fun($item[$nameItem]))) {
+            $this->$fun($item[$nameItem]);
+          } else {
+            // TODO Сделать логирование ошибки
+          }
+        }
+      }
+
   }
 }

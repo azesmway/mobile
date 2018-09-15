@@ -24,6 +24,12 @@ Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
 class PurchasePlanItems extends EntityBase
 {
   /**
+   * @ORM\ManyToOne(targetEntity="\Application\Entity\PurchasePlan", inversedBy="planitems")
+   * @ORM\JoinColumn(name="planid", referencedColumnName="id")
+   */
+  private $plan;
+
+  /**
    * @var int
    *
    * @ORM\Column(name="id", type="integer", precision=0, scale=0, nullable=false, unique=false)
@@ -99,7 +105,7 @@ class PurchasePlanItems extends EntityBase
   /**
    * @var int|null
    *
-   * @ORM\Column(name="okato", type="integer", precision=0, scale=0, nullable=true, unique=false)
+   * @ORM\Column(name="okato", type="string", length=11, precision=0, scale=0, nullable=true, unique=false)
    */
   private $okato;
 
@@ -181,6 +187,20 @@ class PurchasePlanItems extends EntityBase
   private $innovationequivalent;
 
   /**
+   * @var string|null
+   *
+   * @ORM\Column(name="orderpricing", type="text", precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $orderpricing;
+
+  /**
+   * @var string|null
+   *
+   * @ORM\Column(name="cancellationreason", type="string", length=20, precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $cancellationreason;
+
+  /**
    * @var \Application\Entity\Contragents
    *
    * @ORM\ManyToOne(targetEntity="Application\Entity\Contragents", cascade={"persist"})
@@ -193,7 +213,7 @@ class PurchasePlanItems extends EntityBase
   /**
    * @var \Application\Entity\PurchasePlan
    *
-   * @ORM\ManyToOne(targetEntity="Application\Entity\PurchasePlan", inversedBy="planitems", cascade={"persist"})
+   * @ORM\ManyToOne(targetEntity="Application\Entity\PurchasePlan", cascade={"persist"})
    * @ORM\JoinColumns({
    *   @ORM\JoinColumn(name="planid", referencedColumnName="id", nullable=true)
    * })
@@ -326,6 +346,10 @@ class PurchasePlanItems extends EntityBase
    */
   public function setContractenddate($contractenddate = null)
   {
+    if (!empty($contractenddate) && is_string($contractenddate)) {
+      $contractenddate = new \DateTime(date('Y-m-d', strtotime($contractenddate)));
+    }
+
     $this->contractenddate = $contractenddate;
 
     return $this;
@@ -723,6 +747,54 @@ class PurchasePlanItems extends EntityBase
   public function getInnovationequivalent()
   {
     return $this->innovationequivalent;
+  }
+
+  /**
+   * Get orderpricing.
+   *
+   * @return bool|null
+   */
+  public function getOrderpricing()
+  {
+    return $this->orderpricing;
+  }
+
+  /**
+   * Set orderpricing.
+   *
+   * @param bool|null $orderpricing
+   *
+   * @return PurchasePlanItems
+   */
+  public function setOrderpricing($orderpricing = null)
+  {
+    $this->orderpricing = $orderpricing;
+
+    return $this;
+  }
+
+  /**
+   * Set orderpricing.
+   *
+   * @param bool|null $orderpricing
+   *
+   * @return PurchasePlanItems
+   */
+  public function setCancellationreason($cancellationreason = null)
+  {
+    $this->cancellationreason = $cancellationreason;
+
+    return $this;
+  }
+
+  /**
+   * Get innovationequivalent.
+   *
+   * @return bool|null
+   */
+  public function getCancellationreason()
+  {
+    return $this->cancellationreason;
   }
 
   /**

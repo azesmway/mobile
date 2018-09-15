@@ -84,9 +84,9 @@ class PullData
 
     // $this->uploadNsiOkved2();
 
-    // $this->uploadPurchasePlans();
+    $this->uploadPurchasePlans();
 
-    $this->uploadNsiOkv();
+    // $this->uploadNsiOkv();
 
     return true;
   }
