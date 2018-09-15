@@ -16,6 +16,7 @@ use Application\Entity\Okved2;
 use Application\Entity\PurchasePlan;
 use Application\Entity\Contragents;
 use Application\Entity\Okv;
+use Application\Entity\UploadFiles;
 
 class PullData
 {
@@ -452,7 +453,15 @@ class PullData
     $ls = $this->uploadDirNameRegions('/out/published');
     $zipFiles = $this->getPlanFilesCurrentYear($ls[0]);
 
+    $uploadFiles = $this->entityManager->getRepository(UploadFiles::class);
+
     foreach ($zipFiles as $f) {
+      $result = $uploadFiles->findOneByName($f);
+
+      if ($result) {
+        continue;
+      }
+
       $fileZip = $this->uploadFtpFile($f, 'purchasePlan');
       $dirname = $this->extractZip($fileZip);
       $files = $this->getDirEntries($dirname);
@@ -461,6 +470,11 @@ class PullData
         $xml = $this->fromFile($dirname . '/' . $file);
         $this->updatePurchasePlan($xml['ns2:body']['ns2:item']['ns2:purchasePlanData']);
       }
+
+      $uploadFile = new UploadFiles();
+      $uploadFile->update(['dateupdate' => date('c'), 'name' => $f]);
+      $this->entityManager->persist($uploadFile);
+      $this->entityManager->flush();
     }
 
   }

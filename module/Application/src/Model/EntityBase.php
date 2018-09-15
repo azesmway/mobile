@@ -108,6 +108,8 @@ class EntityBase
   }
 
   /**
+   * Обновление по каждой позиции
+   *
    * @param $item
    */
   public function updateItem($item)
