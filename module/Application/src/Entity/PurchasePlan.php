@@ -26,10 +26,10 @@ class PurchasePlan extends EntityBase
 {
 
   /**
-   * @ORM\OneToMany(targetEntity="\Application\Entity\PurchasePlanItems", mappedBy="items")
+   * @ORM\OneToMany(targetEntity="\Application\Entity\PurchasePlanItems", mappedBy="planid", cascade={"persist"})
    * @ORM\JoinColumn(name="id", referencedColumnName="planid")
    */
-  private $items;
+  private $planitems;
 
   /**
    * @ORM\ManyToOne(targetEntity="\Application\Entity\Contragents", inversedBy="plans")
@@ -282,7 +282,7 @@ class PurchasePlan extends EntityBase
    */
   public function __construct()
   {
-    $this->items = new ArrayCollection();
+    $this->planitems = new ArrayCollection();
   }
 
   /**

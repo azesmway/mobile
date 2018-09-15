@@ -84,7 +84,9 @@ class PullData
 
     // $this->uploadNsiOkved2();
 
-    $this->uploadPurchasePlans();
+    // $this->uploadPurchasePlans();
+
+    $this->uploadNsiOkv();
 
     return true;
   }
@@ -256,16 +258,16 @@ class PullData
     $dir = '/out/nsi/nsiOkv';
     $result = $this->getXmlData($dir, 'okv');
 
-    $okved2 = $this->entityManager->getRepository(Okv::class);
+    $okv = $this->entityManager->getRepository(Okv::class);
 
     foreach ($result['ns2:body']['ns2:item'] as $item) {
-      $row = $okved2->findOneByCode($item['ns2:nsiOkved2Data']['ns2:code']);
+      $row = $okv->findOneByCode($item['ns2:nsiOkvData']['ns2:digitalCode']);
 
       if (!$row) {
-        $row = new Okved2();
+        $row = new Okv();
       }
 
-      $row->update($item['ns2:nsiOkved2Data']);
+      $row->update($item['ns2:nsiOkvData']);
       $this->entityManager->persist($row);
     }
 

@@ -183,7 +183,7 @@ class PurchasePlanItems extends EntityBase
   /**
    * @var \Application\Entity\Contragents
    *
-   * @ORM\ManyToOne(targetEntity="Application\Entity\Contragents")
+   * @ORM\ManyToOne(targetEntity="Application\Entity\Contragents", cascade={"persist"})
    * @ORM\JoinColumns({
    *   @ORM\JoinColumn(name="planitemcustomer", referencedColumnName="id", nullable=true)
    * })
@@ -193,7 +193,7 @@ class PurchasePlanItems extends EntityBase
   /**
    * @var \Application\Entity\PurchasePlan
    *
-   * @ORM\ManyToOne(targetEntity="Application\Entity\PurchasePlan")
+   * @ORM\ManyToOne(targetEntity="Application\Entity\PurchasePlan", inversedBy="planitems", cascade={"persist"})
    * @ORM\JoinColumns({
    *   @ORM\JoinColumn(name="planid", referencedColumnName="id", nullable=true)
    * })
@@ -203,7 +203,7 @@ class PurchasePlanItems extends EntityBase
   /**
    * @var \Application\Entity\Okv
    *
-   * @ORM\ManyToOne(targetEntity="Application\Entity\Okv")
+   * @ORM\ManyToOne(targetEntity="Application\Entity\Okv", cascade={"persist"})
    * @ORM\JoinColumns({
    *   @ORM\JoinColumn(name="currency", referencedColumnName="id", nullable=true)
    * })

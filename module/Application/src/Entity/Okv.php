@@ -33,6 +33,13 @@ class Okv extends EntityBase
   private $id;
 
   /**
+   * @var string|null
+   *
+   * @ORM\Column(name="guid", type="string", length=40, precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $guid;
+
+  /**
    * @var \DateTime|null
    *
    * @ORM\Column(name="changedatetime", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
@@ -77,7 +84,7 @@ class Okv extends EntityBase
   /**
    * @var string|null
    *
-   * @ORM\Column(name="name", type="string", length=20, precision=0, scale=0, nullable=true, unique=false)
+   * @ORM\Column(name="name", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
    */
   private $name;
 
@@ -100,6 +107,30 @@ class Okv extends EntityBase
   }
 
   /**
+   * Set guid.
+   *
+   * @param string|null $guid
+   *
+   * @return Okv
+   */
+  public function setGuid($guid = null)
+  {
+    $this->guid = $guid;
+
+    return $this;
+  }
+
+  /**
+   * Get guid.
+   *
+   * @return string|null
+   */
+  public function getGuid()
+  {
+    return $this->guid;
+  }
+
+  /**
    * Set changedatetime.
    *
    * @param \DateTime|null $changedatetime
@@ -108,6 +139,10 @@ class Okv extends EntityBase
    */
   public function setChangedatetime($changedatetime = null)
   {
+    if (!empty($changedatetime) && is_string($changedatetime)) {
+      $changedatetime = new \DateTime(date('c', strtotime($changedatetime)));
+    }
+
     $this->changedatetime = $changedatetime;
 
     return $this;
@@ -132,6 +167,10 @@ class Okv extends EntityBase
    */
   public function setStartdateactive($startdateactive = null)
   {
+    if (!empty($startdateactive) && is_string($startdateactive)) {
+      $startdateactive = new \DateTime(date('c', strtotime($startdateactive)));
+    }
+
     $this->startdateactive = $startdateactive;
 
     return $this;
@@ -156,6 +195,10 @@ class Okv extends EntityBase
    */
   public function setEnddateactive($enddateactive = null)
   {
+    if (!empty($enddateactive) && is_string($enddateactive)) {
+      $enddateactive = new \DateTime(date('c', strtotime($enddateactive)));
+    }
+
     $this->enddateactive = $enddateactive;
 
     return $this;
