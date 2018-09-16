@@ -60,6 +60,7 @@ class PullData
   const MOREDATA = FTP_MOREDATA;
 
   const CURRENT_YEAR = '2018';
+  const PLAN_DIR = '/purchasePlan';
 
   const OKVED2_DIR = '/out/nsi/nsiOkved2';
   const OKVED2_PREFIX = 'okved2';
@@ -107,13 +108,8 @@ class PullData
   public function run()
   {
 
-    // $this->uploadNsiOkved2();
-
     // $this->uploadPurchasePlans();
 
-    // $this->uploadNsiOkv();
-
-    // $this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE);
     $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
 
     return true;
@@ -131,7 +127,7 @@ class PullData
 
     $curPlanFiles = [];
 
-    $ls = $this->ftp->nlist($dir . '/purchasePlan');
+    $ls = $this->ftp->nlist($dir . self::PLAN_DIR);
 
     foreach ($ls as $f) {
       if (strpos($f, '_' . self::CURRENT_YEAR)) {
