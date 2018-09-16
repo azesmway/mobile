@@ -79,6 +79,12 @@ class PullData
   const OKEI_ROOT = 'ns2:nsiOkeiData';
   const OKEI_CODE = 'ns2:code';
 
+  const OKPD2_DIR = '/out/nsi/nsiOkpd2';
+  const OKPD2_PREFIX = 'okpd2';
+  const OKPD2_CLASS = 'Application\Entity\Okpd2';
+  const OKPD2_ROOT = 'ns2:nsiOkpd2Data';
+  const OKPD2_CODE = 'ns2:code';
+
   /**
    * PullData constructor.
    * @param $serviceManager
@@ -108,7 +114,7 @@ class PullData
     // $this->uploadNsiOkv();
 
     // $this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE);
-    $this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE);
+    $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
 
     return true;
   }
@@ -239,8 +245,12 @@ class PullData
     return $entries;
   }
 
-  private function uploadNsi($dir, $prefix, $class, $root, $code)
+  private function uploadNsi($dir, $prefix, $class, $root, $code, $maxExecutionTime = false)
   {
+    if ($maxExecutionTime) {
+      ini_set('max_execution_time', 300);
+    }
+
     $ls = $this->ftp->nlist($dir);
     $name = $ls[count($ls) - 1];
 
@@ -261,6 +271,10 @@ class PullData
       $xml = $this->fromFile($dirname . '/' . $file);
 
       foreach ($xml['ns2:body']['ns2:item'] as $item) {
+        if ($item[$root]['ns2:businessStatus'] === '866') {
+          continue;
+        }
+
         $row = $nsi->findOneByCode($item[$root][$code]);
 
         if (!$row) {
@@ -274,7 +288,7 @@ class PullData
       $this->entityManager->flush();
     }
 
-    $this->logUploadFile($fileZip);
+    $this->logUploadFile($name);
 
     return true;
   }

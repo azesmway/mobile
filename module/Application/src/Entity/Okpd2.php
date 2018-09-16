@@ -36,6 +36,13 @@ class Okpd2 extends EntityBase
   /**
    * @var string|null
    *
+   * @ORM\Column(name="guid", type="string", length=40, precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $guid;
+
+  /**
+   * @var string|null
+   *
    * @ORM\Column(name="code", type="string", length=40, precision=0, scale=0, nullable=true, unique=false)
    */
   private $code;
@@ -43,7 +50,7 @@ class Okpd2 extends EntityBase
   /**
    * @var string|null
    *
-   * @ORM\Column(name="name", type="text", precision=0, scale=0, nullable=true, unique=false)
+   * @ORM\Column(name="name", type="string", length=1000, precision=0, scale=0, nullable=true, unique=false)
    */
   private $name;
 
@@ -57,7 +64,7 @@ class Okpd2 extends EntityBase
   /**
    * @var int|null
    *
-   * @ORM\Column(name="comment", type="integer", precision=0, scale=0, nullable=true, unique=false)
+   * @ORM\Column(name="comment", type="text", precision=0, scale=0, nullable=true, unique=false)
    */
   private $comment;
 
@@ -93,6 +100,30 @@ class Okpd2 extends EntityBase
   public function getId()
   {
     return $this->id;
+  }
+
+  /**
+   * Set guid.
+   *
+   * @param string|null $guid
+   *
+   * @return Okpd2
+   */
+  public function setGuid($guid = null)
+  {
+    $this->guid = $guid;
+
+    return $this;
+  }
+
+  /**
+   * Get guid.
+   *
+   * @return string|null
+   */
+  public function getGuid()
+  {
+    return $this->guid;
   }
 
   /**
