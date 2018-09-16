@@ -152,6 +152,16 @@ class Contragents extends EntityBase
   }
 
   /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'Contragents';
+  }
+
+  /**
    * Get id.
    *
    * @return int

@@ -77,6 +77,15 @@ class Okved2 extends EntityBase
    */
   private $businessstatus;
 
+  /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'Okved2';
+  }
 
   /**
    * Get id.
@@ -217,7 +226,6 @@ class Okved2 extends EntityBase
    */
   public function setChangedatetime($changedatetime = null)
   {
-
     if (!empty($changedatetime) && is_string($changedatetime)) {
       $changedatetime = new \DateTime(date('c', strtotime($changedatetime)));
     }

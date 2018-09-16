@@ -64,10 +64,61 @@ class Okei extends EntityBase
   /**
    * @var string|null
    *
-   * @ORM\Column(name="symbol", type="string", length=10, precision=0, scale=0, nullable=true, unique=false)
+   * @ORM\Column(name="symbol", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
    */
   private $symbol;
 
+  /**
+   * @var string|null
+   *
+   * @ORM\Column(name="sectioncode", type="string", length=1, precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $sectioncode;
+
+  /**
+   * @var string|null
+   *
+   * @ORM\Column(name="sectionname", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $sectionname;
+
+  /**
+   * @var string|null
+   *
+   * @ORM\Column(name="groupcode", type="integer", precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $groupcode;
+
+  /**
+   * @var string|null
+   *
+   * @ORM\Column(name="groupname", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $groupname;
+
+  /**
+   * @var \DateTime|null
+   *
+   * @ORM\Column(name="enddateactive", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $enddateactive;
+
+  /**
+   * @var \DateTime|null
+   *
+   * @ORM\Column(name="startdateactive", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
+   */
+  private $startdateactive;
+
+  /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'Okei';
+  }
 
   /**
    * Get id.
@@ -112,6 +163,10 @@ class Okei extends EntityBase
    */
   public function setChangedatetime($changedatetime = null)
   {
+    if (!empty($changedatetime) && is_string($changedatetime)) {
+      $changedatetime = new \DateTime(date('c', strtotime($changedatetime)));
+    }
+
     $this->changedatetime = $changedatetime;
 
     return $this;
@@ -197,5 +252,157 @@ class Okei extends EntityBase
   public function getSymbol()
   {
     return $this->symbol;
+  }
+
+  /**
+   * Set sectioncode.
+   *
+   * @param string|null $sectioncode
+   *
+   * @return Okei
+   */
+  public function setSectioncode($sectioncode = null)
+  {
+    $this->sectioncode = $sectioncode;
+
+    return $this;
+  }
+
+  /**
+   * Get sectioncode.
+   *
+   * @return string|null
+   */
+  public function getSectioncode()
+  {
+    return $this->sectioncode;
+  }
+
+  /**
+   * Set sectionname.
+   *
+   * @param string|null $sectionname
+   *
+   * @return Okei
+   */
+  public function setSectionname($sectionname = null)
+  {
+    $this->sectionname = $sectionname;
+
+    return $this;
+  }
+
+  /**
+   * Get sectionname.
+   *
+   * @return string|null
+   */
+  public function getSectionname()
+  {
+    return $this->sectionname;
+  }
+
+  /**
+   * Set groupcode.
+   *
+   * @param string|null $groupcode
+   *
+   * @return Okei
+   */
+  public function setGroupcode($groupcode = null)
+  {
+    $this->groupcode = $groupcode;
+
+    return $this;
+  }
+
+  /**
+   * Get groupcode.
+   *
+   * @return string|null
+   */
+  public function getGroupcode()
+  {
+    return $this->groupcode;
+  }
+
+  /**
+   * Set groupname.
+   *
+   * @param string|null $groupname
+   *
+   * @return Okei
+   */
+  public function setGroupname($groupname = null)
+  {
+    $this->groupname = $groupname;
+
+    return $this;
+  }
+
+  /**
+   * Get sectionname.
+   *
+   * @return string|null
+   */
+  public function getGroupname()
+  {
+    return $this->groupname;
+  }
+
+  /**
+   * Set enddateactive.
+   *
+   * @param \DateTime|null $enddateactive
+   *
+   * @return Okpd2
+   */
+  public function setEnddateactive($enddateactive = null)
+  {
+    if (!empty($enddateactive) && is_string($enddateactive)) {
+      $enddateactive = new \DateTime(date('c', strtotime($enddateactive)));
+    }
+
+    $this->enddateactive = $enddateactive;
+
+    return $this;
+  }
+
+  /**
+   * Get enddateactive.
+   *
+   * @return \DateTime|null
+   */
+  public function getEnddateactive()
+  {
+    return $this->enddateactive;
+  }
+
+  /**
+   * Set startdateactive.
+   *
+   * @param \DateTime|null $startdateactive
+   *
+   * @return Okpd2
+   */
+  public function setStartdateactive($startdateactive = null)
+  {
+    if (!empty($startdateactive) && is_string($startdateactive)) {
+      $startdateactive = new \DateTime(date('c', strtotime($startdateactive)));
+    }
+
+    $this->startdateactive = $startdateactive;
+
+    return $this;
+  }
+
+  /**
+   * Get enddateactive.
+   *
+   * @return \DateTime|null
+   */
+  public function getStartdateactive()
+  {
+    return $this->startdateactive;
   }
 }

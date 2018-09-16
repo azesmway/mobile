@@ -84,6 +84,15 @@ class PurchaseplandataItemRows extends EntityBase
    */
   private $planitemid;
 
+  /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'PurchaseplandataItemRows';
+  }
 
   /**
    * Get id.

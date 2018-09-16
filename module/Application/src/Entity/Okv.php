@@ -95,6 +95,15 @@ class Okv extends EntityBase
    */
   private $shortname;
 
+  /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'Okv';
+  }
 
   /**
    * Get id.

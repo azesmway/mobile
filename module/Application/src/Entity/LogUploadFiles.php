@@ -17,10 +17,10 @@ Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
 /**
  * Okv
  *
- * @ORM\Table(name="upload_files", uniqueConstraints={@ORM\UniqueConstraint(name="upload_files_id_uindex", columns={"id"})})
+ * @ORM\Table(name="log_upload_files", uniqueConstraints={@ORM\UniqueConstraint(name="log_upload_files_id_uindex", columns={"id"})})
  * @ORM\Entity
  */
-class UploadFiles extends EntityBase
+class LogUploadFiles extends EntityBase
 {
   /**
    * @var int
@@ -28,7 +28,7 @@ class UploadFiles extends EntityBase
    * @ORM\Column(name="id", type="integer", precision=0, scale=0, nullable=false, unique=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="SEQUENCE")
-   * @ORM\SequenceGenerator(sequenceName="upload_files_id_seq", allocationSize=1, initialValue=1)
+   * @ORM\SequenceGenerator(sequenceName="log_upload_files_id_seq", allocationSize=1, initialValue=1)
    */
   private $id;
 
@@ -47,6 +47,16 @@ class UploadFiles extends EntityBase
   private $name;
 
   /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'LogUploadFiles';
+  }
+
+  /**
    * Get id.
    *
    * @return int
@@ -61,7 +71,7 @@ class UploadFiles extends EntityBase
    *
    * @param \DateTime|null $dateupdate
    *
-   * @return UploadFiles
+   * @return LogUploadFiles
    */
   public function setDateupdate($dateupdate = null)
   {
@@ -89,7 +99,7 @@ class UploadFiles extends EntityBase
    *
    * @param string|null $name
    *
-   * @return UploadFiles
+   * @return LogUploadFiles
    */
   public function setName($name = null)
   {

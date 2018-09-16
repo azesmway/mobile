@@ -286,6 +286,16 @@ class PurchasePlan extends EntityBase
   }
 
   /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'PurchasePlan';
+  }
+
+  /**
    * Get id.
    *
    * @return int

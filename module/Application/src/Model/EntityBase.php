@@ -23,8 +23,18 @@ class EntityBase
   {
     foreach ($entity as $name => $val) {
       $ind = strtolower(str_replace('ns2:', '', $name));
-      $fun = 'set' . ucfirst($ind);
-      $this->$fun($entity[$name]);
+
+      if ($this->getEntityName() === 'Okei' && ($ind === 'section' || $ind === 'group')) {
+        $fun = 'set' . ucfirst($ind . 'code');
+        $this->$fun($entity[$name]['ns2:code']);
+
+        $fun = 'set' . ucfirst($ind . 'name');
+        $this->$fun($entity[$name]['ns2:name']);
+
+      } else {
+        $fun = 'set' . ucfirst($ind);
+        $this->$fun($entity[$name]);
+      }
     }
   }
 
@@ -133,6 +143,24 @@ class EntityBase
       } else {
         $fun = 'set' . ucfirst($indItem);
         $this->$fun($item[$nameItem]);
+      }
+    }
+  }
+
+  public function updateOkei($entity) {
+    foreach ($entity as $name => $val) {
+      $ind = strtolower(str_replace('ns2:', '', $name));
+
+      if ($ind === 'section' || $ind === 'group') {
+        $fun = 'set' . ucfirst($ind . 'code');
+        $this->$fun($entity[$name]['code']);
+
+        $fun = 'set' . ucfirst($ind . 'name');
+        $this->$fun($entity[$name]['name']);
+
+      } else {
+        $fun = 'set' . ucfirst($ind);
+        $this->$fun($entity[$name]);
       }
     }
   }

@@ -230,6 +230,15 @@ class PurchasePlanItems extends EntityBase
    */
   private $currency;
 
+  /**
+   * Возвращаем название класса
+   *
+   * @return string
+   */
+  public function getEntityName()
+  {
+    return 'PurchasePlanItems';
+  }
 
   /**
    * Get id.

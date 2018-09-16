@@ -16,7 +16,7 @@ use Application\Entity\Okved2;
 use Application\Entity\PurchasePlan;
 use Application\Entity\Contragents;
 use Application\Entity\Okv;
-use Application\Entity\UploadFiles;
+use Application\Entity\LogUploadFiles;
 
 class PullData
 {
@@ -61,6 +61,24 @@ class PullData
 
   const CURRENT_YEAR = '2018';
 
+  const OKVED2_DIR = '/out/nsi/nsiOkved2';
+  const OKVED2_PREFIX = 'okved2';
+  const OKVED2_CLASS = 'Application\Entity\Okved2';
+  const OKVED2_ROOT = 'ns2:nsiOkved2Data';
+  const OKVED2_CODE = 'ns2:code';
+
+  const OKV_DIR = '/out/nsi/nsiOkv';
+  const OKV_PREFIX = 'okv';
+  const OKV_CLASS = 'Application\Entity\Okv';
+  const OKV_ROOT = 'ns2:nsiOkvData';
+  const OKV_CODE = 'ns2:digitalCode';
+
+  const OKEI_DIR = '/out/nsi/nsiOkei';
+  const OKEI_PREFIX = 'okei';
+  const OKEI_CLASS = 'Application\Entity\Okei';
+  const OKEI_ROOT = 'ns2:nsiOkeiData';
+  const OKEI_CODE = 'ns2:code';
+
   /**
    * PullData constructor.
    * @param $serviceManager
@@ -85,9 +103,12 @@ class PullData
 
     // $this->uploadNsiOkved2();
 
-    $this->uploadPurchasePlans();
+    // $this->uploadPurchasePlans();
 
     // $this->uploadNsiOkv();
+
+    // $this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE);
+    $this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE);
 
     return true;
   }
@@ -218,90 +239,44 @@ class PullData
     return $entries;
   }
 
-
-  /**
-   * Получение текущего справочника ОКВЕД2
-   *
-   * @return array|string
-   */
-  private function uploadNsiOkved2()
+  private function uploadNsi($dir, $prefix, $class, $root, $code)
   {
-
-    $dir = '/out/nsi/nsiOkved2';
-    $result = $this->getXmlData($dir, 'okved2');
-
-    $okved2 = $this->entityManager->getRepository(Okved2::class);
-
-    foreach ($result['ns2:body']['ns2:item'] as $item) {
-      $row = $okved2->findOneByCode($item['ns2:nsiOkved2Data']['ns2:code']);
-
-      if (!$row) {
-        $row = new Okved2();
-      }
-
-      $row->update($item['ns2:nsiOkved2Data']);
-      $this->entityManager->persist($row);
-    }
-
-    $this->entityManager->flush();
-
-    return true;
-  }
-
-  /**
-   * Получение текущего справочника валют
-   *
-   * @return array|string
-   */
-  private function uploadNsiOkv()
-  {
-
-    $dir = '/out/nsi/nsiOkv';
-    $result = $this->getXmlData($dir, 'okv');
-
-    $okv = $this->entityManager->getRepository(Okv::class);
-
-    foreach ($result['ns2:body']['ns2:item'] as $item) {
-      $row = $okv->findOneByCode($item['ns2:nsiOkvData']['ns2:digitalCode']);
-
-      if (!$row) {
-        $row = new Okv();
-      }
-
-      $row->update($item['ns2:nsiOkvData']);
-      $this->entityManager->persist($row);
-    }
-
-    $this->entityManager->flush();
-
-    return true;
-  }
-
-  /**
-   * Получаем массив данных из xml
-   *
-   * @param $dir
-   * @return array|string
-   * @throws \FtpClient\FtpException
-   */
-  private function getXmlData($dir, $prefix)
-  {
-
-    $xml = array();
     $ls = $this->ftp->nlist($dir);
-
     $name = $ls[count($ls) - 1];
+
+    $logUploadFiles = $this->entityManager->getRepository(LogUploadFiles::class);
+    $result = $logUploadFiles->findOneByName($name);
+
+    if ($result) {
+      return true;
+    }
 
     $fileZip = $this->uploadFtpFile($name, $prefix);
     $dirname = $this->extractZip($fileZip);
     $files = $this->getDirEntries($dirname);
 
+    $nsi = $this->entityManager->getRepository($class);
+
     foreach ($files as $file) {
       $xml = $this->fromFile($dirname . '/' . $file);
+
+      foreach ($xml['ns2:body']['ns2:item'] as $item) {
+        $row = $nsi->findOneByCode($item[$root][$code]);
+
+        if (!$row) {
+          $row = new $class();
+        }
+
+        $row->update($item[$root]);
+        $this->entityManager->persist($row);
+      }
+
+      $this->entityManager->flush();
     }
 
-    return $xml;
+    $this->logUploadFile($fileZip);
 
+    return true;
   }
 
   /**
@@ -453,10 +428,10 @@ class PullData
     $ls = $this->uploadDirNameRegions('/out/published');
     $zipFiles = $this->getPlanFilesCurrentYear($ls[0]);
 
-    $uploadFiles = $this->entityManager->getRepository(UploadFiles::class);
+    $logUploadFiles = $this->entityManager->getRepository(LogUploadFiles::class);
 
     foreach ($zipFiles as $f) {
-      $result = $uploadFiles->findOneByName($f);
+      $result = $logUploadFiles->findOneByName($f);
 
       if ($result) {
         continue;
@@ -471,7 +446,7 @@ class PullData
         $this->updatePurchasePlan($xml['ns2:body']['ns2:item']['ns2:purchasePlanData']);
       }
 
-      $this->saveUploadFile($f);
+      $this->logUploadFile($f);
     }
 
   }
@@ -522,12 +497,12 @@ class PullData
   /**
    * Сохраняем название файла который скачали и обработали
    *
-   * @param $f
+   * @param $fname
    */
-  private function saveUploadFile($f)
+  private function logUploadFile($fname)
   {
-    $uploadFile = new UploadFiles();
-    $uploadFile->update(['dateupdate' => date('c'), 'name' => $f]);
+    $uploadFile = new LogUploadFiles();
+    $uploadFile->update(['dateupdate' => date('c'), 'name' => $fname]);
     $this->entityManager->persist($uploadFile);
     $this->entityManager->flush();
   }
