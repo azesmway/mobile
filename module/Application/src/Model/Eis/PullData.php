@@ -471,10 +471,7 @@ class PullData
         $this->updatePurchasePlan($xml['ns2:body']['ns2:item']['ns2:purchasePlanData']);
       }
 
-      $uploadFile = new UploadFiles();
-      $uploadFile->update(['dateupdate' => date('c'), 'name' => $f]);
-      $this->entityManager->persist($uploadFile);
-      $this->entityManager->flush();
+      $this->saveUploadFile($f);
     }
 
   }
@@ -501,14 +498,37 @@ class PullData
     // Удаляем все позиции и создаем их заново
     $planitems = $plan->getPlanitems();
 
-    foreach ($planitems as $item) {
-      $this->entityManager->remove($item);
-    }
-    $this->entityManager->flush();
+    $this->removeCollection($planitems);
 
     $plan->updatePlanItems($xml['ns2:purchasePlanItems']);
     $this->entityManager->persist($plan);
 
+    $this->entityManager->flush();
+  }
+
+  /**
+   * Удаление всех сущностей из базы
+   *
+   * @param $planitems
+   */
+  private function removeCollection($collection)
+  {
+    foreach ($collection as $item) {
+      $this->entityManager->remove($item);
+    }
+    $this->entityManager->flush();
+  }
+
+  /**
+   * Сохраняем название файла который скачали и обработали
+   *
+   * @param $f
+   */
+  private function saveUploadFile($f)
+  {
+    $uploadFile = new UploadFiles();
+    $uploadFile->update(['dateupdate' => date('c'), 'name' => $f]);
+    $this->entityManager->persist($uploadFile);
     $this->entityManager->flush();
   }
 
