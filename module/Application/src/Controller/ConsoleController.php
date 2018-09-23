@@ -10,6 +10,8 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Console\Adapter\AdapterInterface as Console;
+use Zend\Console\Request as ConsoleRequest;
+use RuntimeException;
 use Application\Model\Eis\PullData;
 
 class ConsoleController extends AbstractActionController
@@ -31,10 +33,17 @@ class ConsoleController extends AbstractActionController
   public function updateDirectoryAction()
   {
     $request = $this->getRequest();
-    $mode = $request->getParam('mode', 'all');
+
+    if (!$request instanceof ConsoleRequest) {
+      throw new RuntimeException('You can only use this action from a console!');
+    }
+
+    $typeDirectory = $request->getParam('typeDirectory', 'all');
 
     $this->getConsole()->writeLine("Starting listener...");
-    $result = $this->eisPullData->run($mode);
+    $result = $this->eisPullData->run($typeDirectory);
+
+    return 'Текст после выполнения';
   }
 
 }

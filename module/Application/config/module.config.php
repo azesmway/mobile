@@ -56,7 +56,7 @@ return [
         'update-directory' => [
           'type'    => Simple::class,
           'options' => [
-            'route'    => 'update-directory [all|okei|okpd2|okv|okved2]:mode',
+            'route'    => 'update-directory [all|okei|okpd2|okv|okved2]:typeDirectory',
             'defaults' => [
               'controller' => Controller\ConsoleController::class,
               'action'     => 'update-directory',
