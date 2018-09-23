@@ -8,11 +8,10 @@
 
 namespace Application\Factory;
 
-use Application\Model\EISMobile;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Db\Adapter\AdapterInterface;
-
+use Application\Model\EISMobile;
 
 class EISMobileFactory implements FactoryInterface {
 

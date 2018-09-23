@@ -11,12 +11,13 @@ namespace Application\Factory;
 use Application\Controller\ConsoleController;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Application\Model\EISMobile;
 
 class ConsoleControllerFactory implements FactoryInterface {
 
   public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
   {
-    return new ConsoleController($container->get('console'));
+    return new ConsoleController($container->get('console'), $container->get(EISMobile::class));
   }
 
 }

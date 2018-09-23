@@ -12,11 +12,9 @@ use Zend\Db\Adapter\AdapterInterface;
 use FtpClient\FtpClient;
 use ZipArchive;
 use XMLReader;
-use Application\Entity\Okved2;
-use Application\Entity\PurchasePlan;
-use Application\Entity\Contragents;
-use Application\Entity\Okv;
 use Application\Entity\LogUploadFiles;
+use Zend\Log\LoggerInterface;
+use Zend\Log\Logger;
 
 class PullData
 {
@@ -27,6 +25,13 @@ class PullData
   private $entityManager;
 
   protected $reader;
+
+  /**
+   * Подключаем логирование.
+   *
+   * @var Zend\Log\LoggerInterface
+   */
+  private $logger;
 
   /**
    * Directory of the file to process.
@@ -110,7 +115,8 @@ class PullData
 
     // $this->uploadPurchasePlans();
 
-    $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
+    $this->logger->log(Logger::INFO, "Connected to eis...");
+    // $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
 
     return true;
   }
@@ -517,4 +523,9 @@ class PullData
     $this->entityManager->flush();
   }
 
+  public function setLogger(LoggerInterface $logger)
+  {
+    $this->logger = $logger;
+    return $this;
+  }
 }

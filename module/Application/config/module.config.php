@@ -108,9 +108,8 @@ return [
       'writers' => [
         [
           'name' => 'stream',
-          'priority' => Logger::DEBUG,
           'options' => [
-            'stream' => 'php://output',
+            'stream' => __DIR__ . '/../../../logs/errors.log',
           ],
         ],
       ],

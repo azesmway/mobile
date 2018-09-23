@@ -27,6 +27,8 @@ class PullDataFactory implements FactoryInterface {
     $controllerPluginManager  = $container;
     $serviceManager           = $controllerPluginManager->get('ServiceManager');
     $dbAdapter                = $controllerPluginManager->get(AdapterInterface::class);
+    $logger                   = $controllerPluginManager->get('logger');
+    $eventManager             = $controllerPluginManager->get('EventManager');
 
     $entityManager = $container->get('doctrine.entitymanager.orm_default');
 
@@ -39,7 +41,10 @@ class PullDataFactory implements FactoryInterface {
     $ftp->connect($host);
     $ftp->login($login, $password);
 
-    return new PullData($serviceManager, $dbAdapter, $ftp, $entityManager);
+    $pullData = new PullData($serviceManager, $dbAdapter, $ftp, $entityManager);
+    $pullData->setLogger($logger);
+
+    return $pullData;
   }
 
 }

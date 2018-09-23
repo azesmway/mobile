@@ -21,6 +21,7 @@ class EISMobile
 
   /**
    * EISMobile constructor.
+   * @param $controllerPluginManager
    * @param $serviceManager
    * @param AdapterInterface $dbAdapter
    */
@@ -38,7 +39,7 @@ class EISMobile
    * @param $requestContent
    * @return array
    */
-  public function run($requestGet, $requestPost, $requestContent) {
+  public function run($requestGet = null, $requestPost = null, $requestContent = null) {
 
     // ---> Пока для теста, работа с таблицей
     $tableGateway = new TableGateway('oauth_access_tokens', $this->dbAdapter);
