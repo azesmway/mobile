@@ -10,6 +10,7 @@ namespace Application;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
+use Zend\Log\Logger;
 
 return [
   'router' => [
@@ -49,11 +50,28 @@ return [
       ],
     ],
   ],
+  'console' => [
+    'router' => [
+      'routes' => [
+        'listen' => [
+          'type'    => 'simple',
+          'options' => [
+            'route'    => 'listen',
+            'defaults' => [
+              'controller' => Controller\ConsoleController::class,
+              'action'     => 'listen',
+            ],
+          ],
+        ],
+      ],
+    ],
+  ],
   'controllers' => [
     'factories' => [
       Controller\IndexController::class => Factory\IndexControllerFactory::class,
       Controller\ApiController::class => Factory\ApiControllerFactory::class,
       Controller\RouteNotFoundController::class => InvokableFactory::class,
+      Controller\ConsoleController::class => Factory\ConsoleControllerFactory::class,
     ]
   ],
   'service_manager' => [
@@ -64,7 +82,10 @@ return [
     'aliases' => [
       'eis' => Model\EISMobile::class,
       'pullData' => Model\Eis\PullData::class,
-    ]
+    ],
+    'abstract_factories' => [
+      'Zend\Log\LoggerAbstractServiceFactory',
+    ],
   ],
   'view_manager' => [
     'display_not_found_reason' => true,
@@ -80,6 +101,19 @@ return [
     ],
     'template_path_stack' => [
       __DIR__ . '/../view',
+    ],
+  ],
+  'log' => [
+    'logger' => [
+      'writers' => [
+        [
+          'name' => 'stream',
+          'priority' => Logger::DEBUG,
+          'options' => [
+            'stream' => 'php://output',
+          ],
+        ],
+      ],
     ],
   ],
 ];
