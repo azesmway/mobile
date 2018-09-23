@@ -10,7 +10,7 @@ namespace Application;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
-use Zend\Log\Logger;
+use Zend\Mvc\Console\Router\Simple;
 
 return [
   'router' => [
@@ -53,13 +53,13 @@ return [
   'console' => [
     'router' => [
       'routes' => [
-        'listen' => [
-          'type'    => 'simple',
+        'update-directory' => [
+          'type'    => Simple::class,
           'options' => [
-            'route'    => 'listen',
+            'route'    => 'update-directory [all|okei|okpd2|okv|okved2]:mode',
             'defaults' => [
               'controller' => Controller\ConsoleController::class,
-              'action'     => 'listen',
+              'action'     => 'update-directory',
             ],
           ],
         ],

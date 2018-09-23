@@ -110,13 +110,33 @@ class PullData
    *
    * @return string
    */
-  public function run()
+  public function run($mode = 'all')
   {
 
     // $this->uploadPurchasePlans();
 
-    $this->logger->log(Logger::INFO, "Connected to eis...");
-    // $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
+    $this->logger->log(Logger::INFO, 'Upload ' . $mode);
+    switch ($mode) {
+      case 'okpd2':
+        $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
+        break;
+      case 'okved2':
+        $this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false);
+        break;
+      case 'okv':
+        $this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false);
+        break;
+      case 'okei':
+        $this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false);
+        break;
+      case 'all':
+        $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
+        $this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false);
+        $this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false);
+        $this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false);
+        break;
+    }
+    //
 
     return true;
   }

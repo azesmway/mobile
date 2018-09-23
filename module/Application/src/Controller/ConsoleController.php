@@ -10,17 +10,17 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Console\Adapter\AdapterInterface as Console;
-use Application\Model\EISMobile;
+use Application\Model\Eis\PullData;
 
 class ConsoleController extends AbstractActionController
 {
   private $console;
-  private $eisMobile;
+  private $eisPullData;
 
-  public function __construct(Console $console, EISMobile $eisMobile)
+  public function __construct(Console $console, PullData $eisPullData)
   {
     $this->console = $console;
-    $this->eisMobile = $eisMobile;
+    $this->eisPullData = $eisPullData;
   }
 
   private function getConsole()
@@ -28,10 +28,13 @@ class ConsoleController extends AbstractActionController
     return $this->console;
   }
 
-  public function listenAction()
+  public function updateDirectoryAction()
   {
+    $request = $this->getRequest();
+    $mode = $request->getParam('mode', 'all');
+
     $this->getConsole()->writeLine("Starting listener...");
-    $result = $this->eisMobile->run();
+    $result = $this->eisPullData->run($mode);
   }
 
 }
