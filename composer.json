@@ -24,7 +24,8 @@
         "symfony/orm-pack": "^1.0",
         "symfony/maker-bundle": "^1.7",
         "zendframework/zend-mvc-console": "^1.2",
-        "zendframework/zend-log": "^2.10"
+        "zendframework/zend-log": "^2.10",
+        "ext-zip": "^1.15"
     },
     "autoload": {
         "psr-4": {

@@ -15,6 +15,7 @@ use XMLReader;
 use Application\Entity\LogUploadFiles;
 use Zend\Log\LoggerInterface;
 use Zend\Log\Logger;
+use Zend\Console\Adapter\AdapterInterface as Console;
 
 class PullData
 {
@@ -110,7 +111,7 @@ class PullData
    *
    * @return string
    */
-  public function run($mode = 'all')
+  public function run($mode = 'all', Console $console)
   {
 
     // $this->uploadPurchasePlans();
@@ -118,25 +119,24 @@ class PullData
     $this->logger->log(Logger::INFO, 'Upload ' . $mode);
     switch ($mode) {
       case 'okpd2':
-        $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
+        $console->writeLine($this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true));
         break;
       case 'okved2':
-        $this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false);
+        $console->writeLine($this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false));
         break;
       case 'okv':
-        $this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false);
+        $console->writeLine($this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false));
         break;
       case 'okei':
-        $this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false);
+        $console->writeLine($this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false));
         break;
       case 'all':
-        $this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true);
-        $this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false);
-        $this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false);
-        $this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false);
+        $console->writeLine($this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true));
+        $console->writeLine($this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false));
+        $console->writeLine($this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false));
+        $console->writeLine($this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false));
         break;
     }
-    //
 
     return true;
   }
@@ -209,7 +209,7 @@ class PullData
       if ($zip->open($tmpFile)) {
 
         if (!file_exists($dirname)) {
-          if (!@mkdir($dirname, 0777, true)) {
+          if (!mkdir($dirname, 0777, true) && !is_dir($dirname)) {
             throw new \Exception('Не могу создать каталог для сохранения', 405);
           }
         }
@@ -257,7 +257,7 @@ class PullData
     $entries = array();
 
     while (false !== ($entry = $h->read())) {
-      if ('.' != $entry && '..' != $entry) {
+      if ('.' !== $entry && '..' !== $entry) {
         $entries[] = $entry;
       }
     }
@@ -280,7 +280,7 @@ class PullData
     $result = $logUploadFiles->findOneByName($name);
 
     if ($result) {
-      return true;
+      return '(' . strtoupper($prefix) . ') there are no updates.';
     }
 
     $fileZip = $this->uploadFtpFile($name, $prefix);
@@ -312,7 +312,7 @@ class PullData
 
     $this->logUploadFile($name);
 
-    return true;
+    return '(' . strtoupper($prefix) . ') update file - ' . $name;
   }
 
   /**

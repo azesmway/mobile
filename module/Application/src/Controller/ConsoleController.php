@@ -39,11 +39,11 @@ class ConsoleController extends AbstractActionController
     }
 
     $typeDirectory = $request->getParam('typeDirectory', 'all');
+    $this->getConsole()->writeLine("Starting update...");
 
-    $this->getConsole()->writeLine("Starting listener...");
-    $result = $this->eisPullData->run($typeDirectory);
+    $result = $this->eisPullData->run($typeDirectory, $this->getConsole());
 
-    return 'Текст после выполнения';
+    return $result[0];
   }
 
 }
