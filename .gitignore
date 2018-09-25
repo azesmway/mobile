@@ -6,3 +6,4 @@ data/DoctrineORMModule/*
 !data/cache/.gitkeep
 phpunit.xml
 logs/
+mobile.*

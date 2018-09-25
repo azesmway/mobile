@@ -51,7 +51,7 @@ class EISMobile
     // <----
 
     // тест на получение класса и работа с ним
-    $pullData = $this->pluginManager->get('pullData');
+    $pullData = $this->pluginManager->get('pull');
     $res = $pullData->run();
 
     return ['success' => true, 'message' => 'You accessed my APIs! Поздравляю!'];

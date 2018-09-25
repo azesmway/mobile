@@ -8,23 +8,102 @@
 
 namespace Application\Model;
 
+use Doctrine\ORM\EntityRepository;
 use Application\Entity\Contragents;
 use Application\Entity\PurchasePlanItems;
+use RuntimeException;
 
-class EntityBase
+class EntityBase extends EntityRepository
 {
+
+  /**
+   * EntityBase constructor.
+   * @param $entityManager
+   * @param $metadata
+   */
+  public function __construct($entityManager, $metadata) {
+
+    EntityRepository::__construct($entityManager, $metadata);
+  }
+
+  /**
+   * @param string $method
+   * @param array $arguments
+   * @return EntityBase|mixed|null
+   * @throws \Doctrine\ORM\ORMException
+   */
+  public function __call($method, $arguments) {
+    $result = null;
+
+    if (preg_match('@^(set|get)(.+)$@i', $method, $matches)) {
+      $name = strtolower($matches[2]);
+      $property = $this->_class->getFieldName($name);
+
+      if (!empty($property)) {
+        if ('set' === strtolower($matches[1])) {
+          if (count($arguments) < 1) {
+            throw new RuntimeException("Set what? (in {$method})");
+          }
+
+          $value = $arguments[0];
+
+          return $this->_setValue($property, $value);
+        } else {
+          return $this->_getValue($property);
+        }
+      }
+    }
+
+    $result = EntityRepository::__call($method, $arguments);
+
+    if ($result) {
+      $result->_class = $this->getClassMetadata();
+      $result->_entityName = $this->getEntityName();
+    }
+
+    return $result;
+  }
+
+  /**
+   * @param $property
+   * @param $value
+   * @return $this
+   */
+  protected function _setValue($property, $value) {
+    $method = 'set' . ucfirst($property);
+
+    if (!method_exists($this, $method)) {
+      $this->$property = $value;
+      return $this;
+    }
+
+    return $this->$method($value);
+  }
+
+  /**
+   * @param $property
+   * @return null
+   */
+  protected function _getValue($property) {
+    $method = 'get' . ucfirst($property);
+
+    if (!method_exists($this, $method)) {
+      return isset($this->$property) ? $this->$property : null;
+    }
+
+    return $this->$method();
+  }
 
   /**
    * Обновляем данные в сущности
    *
    * @param array $entity
    */
-  public function update($entity)
-  {
+  public function update($entity) {
     foreach ($entity as $name => $val) {
       $ind = strtolower(str_replace('ns2:', '', $name));
 
-      if ($this->getEntityName() === 'Okei' && ($ind === 'section' || $ind === 'group')) {
+      if ($this->getEntityName() === 'Application\Entity\Okei' && ($ind === 'section' || $ind === 'group')) {
         $fun = 'set' . ucfirst($ind . 'code');
         $this->$fun($entity[$name]['ns2:code']);
 
@@ -43,8 +122,7 @@ class EntityBase
    *
    * @param array $plan
    */
-  public function updatePlan($plan)
-  {
+  public function updatePlan($plan) {
     $excludeFields = ['purchaseplanitems', 'purchaseplanitemssmb', 'attachments'];
 
     foreach ($plan as $name => $val) {
@@ -103,13 +181,13 @@ class EntityBase
     foreach ($items as $data) {
       if (!empty($data[0])) {
         foreach ($data as $row) {
-          $item = new PurchasePlanItems();
+          $item = new PurchasePlanItems($this->_em, $this->_class);
           $item->updateItem($row);
           $item->setPlanid($this);
           $this->setPlanitems($item);
         }
       } else {
-        $item = new PurchasePlanItems();
+        $item = new PurchasePlanItems($this->_em, $this->_class);
         $item->updateItem($data);
         $item->setPlanid($this);
         $this->setPlanitems($item);
@@ -122,8 +200,7 @@ class EntityBase
    *
    * @param $item
    */
-  public function updateItem($item)
-  {
+  public function updateItem($item) {
     $excludeFields = ['changedgwsanddates', 'changednmskmoretenpercent', 'otherchanges', 'longterm', 'longtermvolumes', 'longtermsmbvolumes',
       'initialpositionid', 'purchaseplanneddate', 'purchasecategory', 'initialpositiondata'];
 
@@ -147,21 +224,4 @@ class EntityBase
     }
   }
 
-  public function updateOkei($entity) {
-    foreach ($entity as $name => $val) {
-      $ind = strtolower(str_replace('ns2:', '', $name));
-
-      if ($ind === 'section' || $ind === 'group') {
-        $fun = 'set' . ucfirst($ind . 'code');
-        $this->$fun($entity[$name]['code']);
-
-        $fun = 'set' . ucfirst($ind . 'name');
-        $this->$fun($entity[$name]['name']);
-
-      } else {
-        $fun = 'set' . ucfirst($ind);
-        $this->$fun($entity[$name]);
-      }
-    }
-  }
 }

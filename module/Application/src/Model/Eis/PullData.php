@@ -23,9 +23,14 @@ class PullData
   private $dbAdapter;
   private $serviceManager;
   private $ftp;
-  private $entityManager;
+  private $em;
 
   protected $reader;
+
+  /**
+   * @var \Doctrine\ORM\UnitOfWork
+   */
+  private $uow;
 
   /**
    * Подключаем логирование.
@@ -103,7 +108,8 @@ class PullData
     $this->dbAdapter = $dbAdapter;
     $this->serviceManager = $serviceManager;
     $this->ftp = $ftp;
-    $this->entityManager = $entityManager;
+    $this->em = $entityManager;
+    $this->uow  = $entityManager->getUnitOfWork();
   }
 
   /**
@@ -267,6 +273,18 @@ class PullData
     return $entries;
   }
 
+  /**
+   * Обновление справочников
+   *
+   * @param $dir
+   * @param $prefix
+   * @param $class
+   * @param $root
+   * @param $code
+   * @param bool $maxExecutionTime
+   * @return string
+   * @throws \FtpClient\FtpException
+   */
   private function uploadNsi($dir, $prefix, $class, $root, $code, $maxExecutionTime = false)
   {
     if ($maxExecutionTime) {
@@ -275,8 +293,9 @@ class PullData
 
     $ls = $this->ftp->nlist($dir);
     $name = $ls[count($ls) - 1];
+    unset($ls);
 
-    $logUploadFiles = $this->entityManager->getRepository(LogUploadFiles::class);
+    $logUploadFiles = $this->em->getRepository(LogUploadFiles::class);
     $result = $logUploadFiles->findOneByName($name);
 
     if ($result) {
@@ -287,7 +306,8 @@ class PullData
     $dirname = $this->extractZip($fileZip);
     $files = $this->getDirEntries($dirname);
 
-    $nsi = $this->entityManager->getRepository($class);
+    $nsi = $this->em->getRepository($class);
+    $metadata = $this->em->getClassMetadata($class);
 
     foreach ($files as $file) {
       $xml = $this->fromFile($dirname . '/' . $file);
@@ -297,20 +317,38 @@ class PullData
           continue;
         }
 
-        $row = $nsi->findOneByCode($item[$root][$code]);
+        $field = strtolower(str_replace('ns2:', '', $code));
+        $method = 'findOneBy' . ucfirst($field);
+        $nameMetadata = $metadata->fieldMappings[$field];
+        $value = $item[$root][$code];
+
+        if ($nameMetadata['type'] === 'integer') {
+          $value = (int)$item[$root][$code];
+        }
+
+        $row = $nsi->$method($value);
 
         if (!$row) {
-          $row = new $class();
+          $row = new $class($this->em, $metadata);
         }
 
         $row->update($item[$root]);
-        $this->entityManager->persist($row);
+        $this->em->persist($row);
       }
 
-      $this->entityManager->flush();
+      if (is_file($dirname . '/' . $file)) {
+        @unlink($dirname . '/' . $file);
+      }
+
+      unset($xml);
     }
 
+    $this->em->flush();
     $this->logUploadFile($name);
+
+    if (is_file($fileZip)) {
+      @unlink($fileZip);
+    }
 
     return '(' . strtoupper($prefix) . ') update file - ' . $name;
   }
@@ -464,7 +502,7 @@ class PullData
     $ls = $this->uploadDirNameRegions('/out/published');
     $zipFiles = $this->getPlanFilesCurrentYear($ls[0]);
 
-    $logUploadFiles = $this->entityManager->getRepository(LogUploadFiles::class);
+    $logUploadFiles = $this->em->getRepository(LogUploadFiles::class);
 
     foreach ($zipFiles as $f) {
       $result = $logUploadFiles->findOneByName($f);
@@ -495,7 +533,7 @@ class PullData
   private function updatePurchasePlan($xml)
   {
 
-    $purchasePlan = $this->entityManager->getRepository(PurchasePlan::class);
+    $purchasePlan = $this->em->getRepository(PurchasePlan::class);
     $plan = $purchasePlan->findOneByRegistrationnumber($xml['ns2:registrationNumber']);
 
     if (!$plan) {
@@ -504,7 +542,7 @@ class PullData
 
     // Создаем/обновляем план
     $plan->updatePlan($xml);
-    $this->entityManager->persist($plan);
+    $this->em->persist($plan);
 
     // Удаляем все позиции и создаем их заново
     $planitems = $plan->getPlanitems();
@@ -512,9 +550,9 @@ class PullData
     $this->removeCollection($planitems);
 
     $plan->updatePlanItems($xml['ns2:purchasePlanItems']);
-    $this->entityManager->persist($plan);
+    $this->em->persist($plan);
 
-    $this->entityManager->flush();
+    $this->em->flush();
   }
 
   /**
@@ -525,9 +563,9 @@ class PullData
   private function removeCollection($collection)
   {
     foreach ($collection as $item) {
-      $this->entityManager->remove($item);
+      $this->em->remove($item);
     }
-    $this->entityManager->flush();
+    $this->em->flush();
   }
 
   /**
@@ -537,10 +575,10 @@ class PullData
    */
   private function logUploadFile($fname)
   {
-    $uploadFile = new LogUploadFiles();
+    $uploadFile = new LogUploadFiles($this->em, $this->em->getClassMetadata('Application\Entity\LogUploadFiles'));
     $uploadFile->update(['dateupdate' => date('c'), 'name' => $fname]);
-    $this->entityManager->persist($uploadFile);
-    $this->entityManager->flush();
+    $this->em->persist($uploadFile);
+    $this->em->flush();
   }
 
   public function setLogger(LoggerInterface $logger)

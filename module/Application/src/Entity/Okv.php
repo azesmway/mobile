@@ -18,7 +18,7 @@ Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
  * Okv
  *
  * @ORM\Table(name="okv", uniqueConstraints={@ORM\UniqueConstraint(name="okv_id_uindex", columns={"id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Application\Model\EntityBase")
  */
 class Okv extends EntityBase
 {
@@ -30,70 +30,70 @@ class Okv extends EntityBase
    * @ORM\GeneratedValue(strategy="SEQUENCE")
    * @ORM\SequenceGenerator(sequenceName="okv_id_seq", allocationSize=1, initialValue=1)
    */
-  private $id;
+  protected $id;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="guid", type="string", length=40, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $guid;
+  protected $guid;
 
   /**
    * @var \DateTime|null
    *
    * @ORM\Column(name="changedatetime", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $changedatetime;
+  protected $changedatetime;
 
   /**
    * @var \DateTime|null
    *
-   * @ORM\Column(name="startdateactive", type="datetime", precision=0, scale=0, nullable=true, unique=false)
+   * @ORM\Column(name="startdateactive", type="date", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $startdateactive;
+  protected $startdateactive;
 
   /**
    * @var \DateTime|null
    *
-   * @ORM\Column(name="enddateactive", type="datetime", precision=0, scale=0, nullable=true, unique=false)
+   * @ORM\Column(name="enddateactive", type="date", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $enddateactive;
+  protected $enddateactive;
 
   /**
    * @var int|null
    *
    * @ORM\Column(name="businessstatus", type="integer", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $businessstatus;
+  protected $businessstatus;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="code", type="string", length=10, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $code;
+  protected $code;
 
   /**
    * @var int|null
    *
    * @ORM\Column(name="digitalcode", type="integer", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $digitalcode;
+  protected $digitalcode;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="name", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $name;
+  protected $name;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="shortname", type="text", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $shortname;
+  protected $shortname;
 
   /**
    * Возвращаем название класса
@@ -102,41 +102,7 @@ class Okv extends EntityBase
    */
   public function getEntityName()
   {
-    return 'Okv';
-  }
-
-  /**
-   * Get id.
-   *
-   * @return int
-   */
-  public function getId()
-  {
-    return $this->id;
-  }
-
-  /**
-   * Set guid.
-   *
-   * @param string|null $guid
-   *
-   * @return Okv
-   */
-  public function setGuid($guid = null)
-  {
-    $this->guid = $guid;
-
-    return $this;
-  }
-
-  /**
-   * Get guid.
-   *
-   * @return string|null
-   */
-  public function getGuid()
-  {
-    return $this->guid;
+    return $this->_entityName;
   }
 
   /**
@@ -158,16 +124,6 @@ class Okv extends EntityBase
   }
 
   /**
-   * Get changedatetime.
-   *
-   * @return \DateTime|null
-   */
-  public function getChangedatetime()
-  {
-    return $this->changedatetime;
-  }
-
-  /**
    * Set startdateactive.
    *
    * @param \DateTime|null $startdateactive
@@ -177,22 +133,12 @@ class Okv extends EntityBase
   public function setStartdateactive($startdateactive = null)
   {
     if (!empty($startdateactive) && is_string($startdateactive)) {
-      $startdateactive = new \DateTime(date('c', strtotime($startdateactive)));
+      $startdateactive = new \DateTime(date('Y-m-d', strtotime($startdateactive)));
     }
 
     $this->startdateactive = $startdateactive;
 
     return $this;
-  }
-
-  /**
-   * Get startdateactive.
-   *
-   * @return \DateTime|null
-   */
-  public function getStartdateactive()
-  {
-    return $this->startdateactive;
   }
 
   /**
@@ -205,7 +151,7 @@ class Okv extends EntityBase
   public function setEnddateactive($enddateactive = null)
   {
     if (!empty($enddateactive) && is_string($enddateactive)) {
-      $enddateactive = new \DateTime(date('c', strtotime($enddateactive)));
+      $enddateactive = new \DateTime(date('Y-m-d', strtotime($enddateactive)));
     }
 
     $this->enddateactive = $enddateactive;
@@ -213,133 +159,4 @@ class Okv extends EntityBase
     return $this;
   }
 
-  /**
-   * Get enddateactive.
-   *
-   * @return \DateTime|null
-   */
-  public function getEnddateactive()
-  {
-    return $this->enddateactive;
-  }
-
-  /**
-   * Set businessstatus.
-   *
-   * @param int|null $businessstatus
-   *
-   * @return Okv
-   */
-  public function setBusinessstatus($businessstatus = null)
-  {
-    $this->businessstatus = $businessstatus;
-
-    return $this;
-  }
-
-  /**
-   * Get businessstatus.
-   *
-   * @return int|null
-   */
-  public function getBusinessstatus()
-  {
-    return $this->businessstatus;
-  }
-
-  /**
-   * Set code.
-   *
-   * @param string|null $code
-   *
-   * @return Okv
-   */
-  public function setCode($code = null)
-  {
-    $this->code = $code;
-
-    return $this;
-  }
-
-  /**
-   * Get code.
-   *
-   * @return string|null
-   */
-  public function getCode()
-  {
-    return $this->code;
-  }
-
-  /**
-   * Set digitalcode.
-   *
-   * @param int|null $digitalcode
-   *
-   * @return Okv
-   */
-  public function setDigitalcode($digitalcode = null)
-  {
-    $this->digitalcode = $digitalcode;
-
-    return $this;
-  }
-
-  /**
-   * Get digitalcode.
-   *
-   * @return int|null
-   */
-  public function getDigitalcode()
-  {
-    return $this->digitalcode;
-  }
-
-  /**
-   * Set name.
-   *
-   * @param string|null $name
-   *
-   * @return Okv
-   */
-  public function setName($name = null)
-  {
-    $this->name = $name;
-
-    return $this;
-  }
-
-  /**
-   * Get name.
-   *
-   * @return string|null
-   */
-  public function getName()
-  {
-    return $this->name;
-  }
-
-  /**
-   * Set shortname.
-   *
-   * @param string|null $shortname
-   *
-   * @return Okv
-   */
-  public function setShortname($shortname = null)
-  {
-    $this->shortname = $shortname;
-
-    return $this;
-  }
-
-  /**
-   * Get shortname.
-   *
-   * @return string|null
-   */
-  public function getShortname()
-  {
-    return $this->shortname;
-  }
 }
