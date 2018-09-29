@@ -10,7 +10,7 @@ namespace Application\Factory;
 
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
-use Application\Model\Eis\PullData;
+use Application\Model\PullData;
 use Zend\Db\Adapter\AdapterInterface;
 
 class PullDataFactory implements FactoryInterface {

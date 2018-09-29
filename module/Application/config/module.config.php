@@ -77,12 +77,12 @@ return [
   'service_manager' => [
     'factories' => [
       Model\EISMobile::class => Factory\EISMobileFactory::class,
-      Model\Eis\PullData::class => Factory\PullDataFactory::class,
+      Model\PullData::class => Factory\PullDataFactory::class,
       Model\EntityBase::class => Factory\EntityBaseFactory::class
     ],
     'aliases' => [
       'eis' => Model\EISMobile::class,
-      'pull' => Model\Eis\PullData::class,
+      'pull' => Model\PullData::class,
       'base' => Model\EntityBase::class,
     ],
     'abstract_factories' => [

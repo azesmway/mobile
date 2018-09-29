@@ -12,7 +12,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\Console\Request as ConsoleRequest;
 use RuntimeException;
-use Application\Model\Eis\PullData;
+use Application\Model\PullData;
 
 class ConsoleController extends AbstractActionController
 {

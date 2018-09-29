@@ -6,7 +6,7 @@
  * Time: 18:49
  */
 
-namespace Application\Model\Eis;
+namespace Application\Model;
 
 use Zend\Db\Adapter\AdapterInterface;
 use FtpClient\FtpClient;

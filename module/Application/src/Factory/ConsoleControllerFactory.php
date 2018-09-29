@@ -11,7 +11,7 @@ namespace Application\Factory;
 use Application\Controller\ConsoleController;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Application\Model\Eis\PullData;
+use Application\Model\PullData;
 
 class ConsoleControllerFactory implements FactoryInterface {
 
