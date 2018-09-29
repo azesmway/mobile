@@ -17,16 +17,6 @@ class EntityBase extends EntityRepository
 {
 
   /**
-   * EntityBase constructor.
-   * @param $entityManager
-   * @param $metadata
-   */
-  public function __construct($entityManager, $metadata) {
-
-    EntityRepository::__construct($entityManager, $metadata);
-  }
-
-  /**
    * @param string $method
    * @param array $arguments
    * @return EntityBase|mixed|null
@@ -49,12 +39,13 @@ class EntityBase extends EntityRepository
 
           return $this->_setValue($property, $value);
         } else {
+
           return $this->_getValue($property);
         }
       }
     }
 
-    $result = EntityRepository::__call($method, $arguments);
+    $result = parent::__call($method, $arguments);
 
     if ($result) {
       $result->_class = $this->getClassMetadata();

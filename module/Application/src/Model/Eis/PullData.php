@@ -20,31 +20,26 @@ use Zend\Console\Adapter\AdapterInterface as Console;
 class PullData
 {
 
-  private $dbAdapter;
-  private $serviceManager;
-  private $ftp;
-  private $em;
+  private $_dbAdapter;
+  private $_sm;
+  private $_ftp;
+  private $_em;
 
-  protected $reader;
-
-  /**
-   * @var \Doctrine\ORM\UnitOfWork
-   */
-  private $uow;
+  private $_reader;
 
   /**
    * Подключаем логирование.
    *
    * @var Zend\Log\LoggerInterface
    */
-  private $logger;
+  private $_logger;
 
   /**
    * Directory of the file to process.
    *
    * @var string
    */
-  protected $directory;
+  private $_directory;
 
   /**
    * Nodes to handle as plain text.
@@ -105,11 +100,10 @@ class PullData
    */
   public function __construct($serviceManager, AdapterInterface $dbAdapter, FtpClient $ftp, $entityManager)
   {
-    $this->dbAdapter = $dbAdapter;
-    $this->serviceManager = $serviceManager;
-    $this->ftp = $ftp;
-    $this->em = $entityManager;
-    $this->uow  = $entityManager->getUnitOfWork();
+    $this->_dbAdapter = $dbAdapter;
+    $this->_sm = $serviceManager;
+    $this->_ftp = $ftp;
+    $this->_em = $entityManager;
   }
 
   /**
@@ -122,7 +116,7 @@ class PullData
 
     // $this->uploadPurchasePlans();
 
-    $this->logger->log(Logger::INFO, 'Upload ' . $mode);
+    $this->_logger->log(Logger::INFO, 'Upload ' . $mode);
     switch ($mode) {
       case 'okpd2':
         $console->writeLine($this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true));
@@ -159,7 +153,7 @@ class PullData
 
     $curPlanFiles = [];
 
-    $ls = $this->ftp->nlist($dir . self::PLAN_DIR);
+    $ls = $this->_ftp->nlist($dir . self::PLAN_DIR);
 
     foreach ($ls as $f) {
       if (strpos($f, '_' . self::CURRENT_YEAR)) {
@@ -183,7 +177,7 @@ class PullData
     $tmpFile = tempnam(sys_get_temp_dir(), $prefix . '_');
     $fp = fopen($tmpFile, 'w');
 
-    $isHere = $this->ftp->fget($fp, $name, self::BINARY);
+    $isHere = $this->_ftp->fget($fp, $name, self::BINARY);
 
     if (!$isHere) {
       fclose($fp);
@@ -291,11 +285,11 @@ class PullData
       ini_set('max_execution_time', 300);
     }
 
-    $ls = $this->ftp->nlist($dir);
+    $ls = $this->_ftp->nlist($dir);
     $name = $ls[count($ls) - 1];
     unset($ls);
 
-    $logUploadFiles = $this->em->getRepository(LogUploadFiles::class);
+    $logUploadFiles = $this->_em->getRepository(LogUploadFiles::class);
     $result = $logUploadFiles->findOneByName($name);
 
     if ($result) {
@@ -306,8 +300,8 @@ class PullData
     $dirname = $this->extractZip($fileZip);
     $files = $this->getDirEntries($dirname);
 
-    $nsi = $this->em->getRepository($class);
-    $metadata = $this->em->getClassMetadata($class);
+    $nsi = $this->_em->getRepository($class);
+    $metadata = $this->_em->getClassMetadata($class);
 
     foreach ($files as $file) {
       $xml = $this->fromFile($dirname . '/' . $file);
@@ -329,11 +323,11 @@ class PullData
         $row = $nsi->$method($value);
 
         if (!$row) {
-          $row = new $class($this->em, $metadata);
+          $row = new $class($this->_em, $metadata);
         }
 
         $row->update($item[$root]);
-        $this->em->persist($row);
+        $this->_em->persist($row);
       }
 
       if (is_file($dirname . '/' . $file)) {
@@ -343,7 +337,7 @@ class PullData
       unset($xml);
     }
 
-    $this->em->flush();
+    $this->_em->flush();
     $this->logUploadFile($name);
 
     if (is_file($fileZip)) {
@@ -367,10 +361,10 @@ class PullData
         $filename
       ));
     }
-    $this->reader = new XMLReader();
-    $this->reader->open($filename, null, LIBXML_XINCLUDE);
+    $this->_reader = new XMLReader();
+    $this->_reader->open($filename, null, LIBXML_XINCLUDE);
 
-    $this->directory = dirname($filename);
+    $this->_directory = dirname($filename);
 
     set_error_handler(
       function ($error, $message = '') use ($filename) {
@@ -383,7 +377,7 @@ class PullData
     );
     $return = $this->process();
     restore_error_handler();
-    $this->reader->close();
+    $this->_reader->close();
 
     return $return;
   }
@@ -402,23 +396,23 @@ class PullData
   /**
    * Идем по xml
    *
-   * @return string
+   * @return array || string
    */
   private function processNextElement()
   {
     $children = [];
     $text = '';
 
-    while ($this->reader->read()) {
-      if ($this->reader->nodeType === XMLReader::ELEMENT) {
-        if ($this->reader->depth === 0) {
+    while ($this->_reader->read()) {
+      if ($this->_reader->nodeType === XMLReader::ELEMENT) {
+        if ($this->_reader->depth === 0) {
           return $this->processNextElement();
         }
 
         $attributes = $this->getAttributes();
-        $name = $this->reader->name;
+        $name = $this->_reader->name;
 
-        if ($this->reader->isEmptyElement) {
+        if ($this->_reader->isEmptyElement) {
           $child = [];
         } else {
           $child = $this->processNextElement();
@@ -445,10 +439,10 @@ class PullData
         } else {
           $children[$name] = $child;
         }
-      } elseif ($this->reader->nodeType === XMLReader::END_ELEMENT) {
+      } elseif ($this->_reader->nodeType === XMLReader::END_ELEMENT) {
         break;
-      } elseif (in_array($this->reader->nodeType, $this->textNodes)) {
-        $text .= $this->reader->value;
+      } elseif (in_array($this->_reader->nodeType, $this->textNodes)) {
+        $text .= $this->_reader->value;
       }
     }
 
@@ -464,12 +458,12 @@ class PullData
   {
     $attributes = [];
 
-    if ($this->reader->hasAttributes) {
-      while ($this->reader->moveToNextAttribute()) {
-        $attributes[$this->reader->localName] = $this->reader->value;
+    if ($this->_reader->hasAttributes) {
+      while ($this->_reader->moveToNextAttribute()) {
+        $attributes[$this->_reader->localName] = $this->_reader->value;
       }
 
-      $this->reader->moveToElement();
+      $this->_reader->moveToElement();
     }
 
     return $attributes;
@@ -485,7 +479,7 @@ class PullData
   private function uploadDirNameRegions($dir)
   {
 
-    $ls = $this->ftp->nlist($dir);
+    $ls = $this->_ftp->nlist($dir);
 
     return $ls;
 
@@ -502,7 +496,7 @@ class PullData
     $ls = $this->uploadDirNameRegions('/out/published');
     $zipFiles = $this->getPlanFilesCurrentYear($ls[0]);
 
-    $logUploadFiles = $this->em->getRepository(LogUploadFiles::class);
+    $logUploadFiles = $this->_em->getRepository(LogUploadFiles::class);
 
     foreach ($zipFiles as $f) {
       $result = $logUploadFiles->findOneByName($f);
@@ -533,7 +527,7 @@ class PullData
   private function updatePurchasePlan($xml)
   {
 
-    $purchasePlan = $this->em->getRepository(PurchasePlan::class);
+    $purchasePlan = $this->_em->getRepository(PurchasePlan::class);
     $plan = $purchasePlan->findOneByRegistrationnumber($xml['ns2:registrationNumber']);
 
     if (!$plan) {
@@ -542,7 +536,7 @@ class PullData
 
     // Создаем/обновляем план
     $plan->updatePlan($xml);
-    $this->em->persist($plan);
+    $this->_em->persist($plan);
 
     // Удаляем все позиции и создаем их заново
     $planitems = $plan->getPlanitems();
@@ -550,9 +544,9 @@ class PullData
     $this->removeCollection($planitems);
 
     $plan->updatePlanItems($xml['ns2:purchasePlanItems']);
-    $this->em->persist($plan);
+    $this->_em->persist($plan);
 
-    $this->em->flush();
+    $this->_em->flush();
   }
 
   /**
@@ -563,9 +557,9 @@ class PullData
   private function removeCollection($collection)
   {
     foreach ($collection as $item) {
-      $this->em->remove($item);
+      $this->_em->remove($item);
     }
-    $this->em->flush();
+    $this->_em->flush();
   }
 
   /**
@@ -575,15 +569,15 @@ class PullData
    */
   private function logUploadFile($fname)
   {
-    $uploadFile = new LogUploadFiles($this->em, $this->em->getClassMetadata('Application\Entity\LogUploadFiles'));
+    $uploadFile = new LogUploadFiles($this->_em, $this->_em->getClassMetadata('Application\Entity\LogUploadFiles'));
     $uploadFile->update(['dateupdate' => date('c'), 'name' => $fname]);
-    $this->em->persist($uploadFile);
-    $this->em->flush();
+    $this->_em->persist($uploadFile);
+    $this->_em->flush();
   }
 
   public function setLogger(LoggerInterface $logger)
   {
-    $this->logger = $logger;
+    $this->_logger = $logger;
     return $this;
   }
 }
