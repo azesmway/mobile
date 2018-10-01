@@ -7,9 +7,8 @@ use Doctrine\DBAL\Types\Type;
 use Application\Model\EntityBase;
 
 /*
- * Переназночаем типы для PostgreSQL
+ * Переназначаем типы для PostgreSQL
  */
-
 Type::overrideType('datetime', 'Doctrine\DBAL\Types\VarDateTimeType');
 Type::overrideType('datetimetz', 'Doctrine\DBAL\Types\VarDateTimeType');
 Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
@@ -19,7 +18,7 @@ Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
  * Okei
  *
  * @ORM\Table(name="okei", uniqueConstraints={@ORM\UniqueConstraint(name="okei_id_uindex", columns={"id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Application\Model\EntityBase")
  */
 class Okei extends EntityBase
 {
@@ -31,128 +30,84 @@ class Okei extends EntityBase
    * @ORM\GeneratedValue(strategy="SEQUENCE")
    * @ORM\SequenceGenerator(sequenceName="okei_id_seq", allocationSize=1, initialValue=1)
    */
-  private $id;
+  protected $id;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="name", type="text", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $name;
+  protected $name;
 
   /**
    * @var \DateTime|null
    *
    * @ORM\Column(name="changedatetime", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $changedatetime;
+  protected $changedatetime;
 
   /**
    * @var int|null
    *
    * @ORM\Column(name="businessstatus", type="integer", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $businessstatus;
+  protected $businessstatus;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="code", type="string", length=10, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $code;
+  protected $code;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="symbol", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $symbol;
+  protected $symbol;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="sectioncode", type="string", length=1, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $sectioncode;
+  protected $sectioncode;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="sectionname", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $sectionname;
+  protected $sectionname;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="groupcode", type="integer", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $groupcode;
+  protected $groupcode;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="groupname", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $groupname;
+  protected $groupname;
 
   /**
    * @var \DateTime|null
    *
    * @ORM\Column(name="enddateactive", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $enddateactive;
+  protected $enddateactive;
 
   /**
    * @var \DateTime|null
    *
    * @ORM\Column(name="startdateactive", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $startdateactive;
-
-  /**
-   * Возвращаем название класса
-   *
-   * @return string
-   */
-  public function getEntityName()
-  {
-    return 'Okei';
-  }
-
-  /**
-   * Get id.
-   *
-   * @return int
-   */
-  public function getId()
-  {
-    return $this->id;
-  }
-
-  /**
-   * Set name.
-   *
-   * @param string|null $name
-   *
-   * @return Okei
-   */
-  public function setName($name = null)
-  {
-    $this->name = $name;
-
-    return $this;
-  }
-
-  /**
-   * Get name.
-   *
-   * @return string|null
-   */
-  public function getName()
-  {
-    return $this->name;
-  }
+  protected $startdateactive;
 
   /**
    * Set changedatetime.
@@ -170,184 +125,6 @@ class Okei extends EntityBase
     $this->changedatetime = $changedatetime;
 
     return $this;
-  }
-
-  /**
-   * Get changedatetime.
-   *
-   * @return \DateTime|null
-   */
-  public function getChangedatetime()
-  {
-    return $this->changedatetime;
-  }
-
-  /**
-   * Set businessstatus.
-   *
-   * @param int|null $businessstatus
-   *
-   * @return Okei
-   */
-  public function setBusinessstatus($businessstatus = null)
-  {
-    $this->businessstatus = $businessstatus;
-
-    return $this;
-  }
-
-  /**
-   * Get businessstatus.
-   *
-   * @return int|null
-   */
-  public function getBusinessstatus()
-  {
-    return $this->businessstatus;
-  }
-
-  /**
-   * Set code.
-   *
-   * @param string|null $code
-   *
-   * @return Okei
-   */
-  public function setCode($code = null)
-  {
-    $this->code = $code;
-
-    return $this;
-  }
-
-  /**
-   * Get code.
-   *
-   * @return string|null
-   */
-  public function getCode()
-  {
-    return $this->code;
-  }
-
-  /**
-   * Set symbol.
-   *
-   * @param string|null $symbol
-   *
-   * @return Okei
-   */
-  public function setSymbol($symbol = null)
-  {
-    $this->symbol = $symbol;
-
-    return $this;
-  }
-
-  /**
-   * Get symbol.
-   *
-   * @return string|null
-   */
-  public function getSymbol()
-  {
-    return $this->symbol;
-  }
-
-  /**
-   * Set sectioncode.
-   *
-   * @param string|null $sectioncode
-   *
-   * @return Okei
-   */
-  public function setSectioncode($sectioncode = null)
-  {
-    $this->sectioncode = $sectioncode;
-
-    return $this;
-  }
-
-  /**
-   * Get sectioncode.
-   *
-   * @return string|null
-   */
-  public function getSectioncode()
-  {
-    return $this->sectioncode;
-  }
-
-  /**
-   * Set sectionname.
-   *
-   * @param string|null $sectionname
-   *
-   * @return Okei
-   */
-  public function setSectionname($sectionname = null)
-  {
-    $this->sectionname = $sectionname;
-
-    return $this;
-  }
-
-  /**
-   * Get sectionname.
-   *
-   * @return string|null
-   */
-  public function getSectionname()
-  {
-    return $this->sectionname;
-  }
-
-  /**
-   * Set groupcode.
-   *
-   * @param string|null $groupcode
-   *
-   * @return Okei
-   */
-  public function setGroupcode($groupcode = null)
-  {
-    $this->groupcode = $groupcode;
-
-    return $this;
-  }
-
-  /**
-   * Get groupcode.
-   *
-   * @return string|null
-   */
-  public function getGroupcode()
-  {
-    return $this->groupcode;
-  }
-
-  /**
-   * Set groupname.
-   *
-   * @param string|null $groupname
-   *
-   * @return Okei
-   */
-  public function setGroupname($groupname = null)
-  {
-    $this->groupname = $groupname;
-
-    return $this;
-  }
-
-  /**
-   * Get sectionname.
-   *
-   * @return string|null
-   */
-  public function getGroupname()
-  {
-    return $this->groupname;
   }
 
   /**
@@ -369,16 +146,6 @@ class Okei extends EntityBase
   }
 
   /**
-   * Get enddateactive.
-   *
-   * @return \DateTime|null
-   */
-  public function getEnddateactive()
-  {
-    return $this->enddateactive;
-  }
-
-  /**
    * Set startdateactive.
    *
    * @param \DateTime|null $startdateactive
@@ -396,13 +163,4 @@ class Okei extends EntityBase
     return $this;
   }
 
-  /**
-   * Get enddateactive.
-   *
-   * @return \DateTime|null
-   */
-  public function getStartdateactive()
-  {
-    return $this->startdateactive;
-  }
 }

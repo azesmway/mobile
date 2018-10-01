@@ -16,11 +16,12 @@ use Application\Entity\LogUploadFiles;
 use Zend\Log\LoggerInterface;
 use Zend\Log\Logger;
 use Zend\Console\Adapter\AdapterInterface as Console;
+use RuntimeException;
 
 class PullData
 {
 
-  private $_dbAdapter;
+  private $_db;
   private $_sm;
   private $_ftp;
   private $_em;
@@ -53,7 +54,11 @@ class PullData
     XMLReader::SIGNIFICANT_WHITESPACE
   ];
 
-
+  /**
+   * Константы для ftp
+   *
+   * @var int
+   */
   const ASCII = FTP_ASCII;
   const TEXT = FTP_TEXT;
   const BINARY = FTP_BINARY;
@@ -65,32 +70,49 @@ class PullData
   const FINISHED = FTP_FINISHED;
   const MOREDATA = FTP_MOREDATA;
 
+  /**
+   * Текущий год и каталог с планами
+   *
+   * @var string
+   */
   const CURRENT_YEAR = '2018';
   const PLAN_DIR = '/purchasePlan';
 
-  const OKVED2_DIR = '/out/nsi/nsiOkved2';
-  const OKVED2_PREFIX = 'okved2';
-  const OKVED2_CLASS = 'Application\Entity\Okved2';
-  const OKVED2_ROOT = 'ns2:nsiOkved2Data';
-  const OKVED2_CODE = 'ns2:code';
-
-  const OKV_DIR = '/out/nsi/nsiOkv';
-  const OKV_PREFIX = 'okv';
-  const OKV_CLASS = 'Application\Entity\Okv';
-  const OKV_ROOT = 'ns2:nsiOkvData';
-  const OKV_CODE = 'ns2:digitalCode';
-
-  const OKEI_DIR = '/out/nsi/nsiOkei';
-  const OKEI_PREFIX = 'okei';
-  const OKEI_CLASS = 'Application\Entity\Okei';
-  const OKEI_ROOT = 'ns2:nsiOkeiData';
-  const OKEI_CODE = 'ns2:code';
-
-  const OKPD2_DIR = '/out/nsi/nsiOkpd2';
-  const OKPD2_PREFIX = 'okpd2';
-  const OKPD2_CLASS = 'Application\Entity\Okpd2';
-  const OKPD2_ROOT = 'ns2:nsiOkpd2Data';
-  const OKPD2_CODE = 'ns2:code';
+  /**
+   * Настройка для справочников
+   *
+   * @var array
+   */
+  protected $directory = [
+    'okv' => [
+      'dir' => '/out/nsi/nsiOkv',
+      'prefix' => 'okv',
+      'class' => 'Application\Entity\Okv',
+      'root' => 'ns2:nsiOkvData',
+      'code' => 'ns2:digitalCode'
+    ],
+    'okved2' => [
+      'dir' => '/out/nsi/nsiOkved2',
+      'prefix' => 'okved2',
+      'class' => 'Application\Entity\Okved2',
+      'root' => 'ns2:nsiOkved2Data',
+      'code' => 'ns2:code'
+    ],
+    'okei' => [
+      'dir' => '/out/nsi/nsiOkei',
+      'prefix' => 'okei',
+      'class' => 'Application\Entity\Okei',
+      'root' => 'ns2:nsiOkeiData',
+      'code' => 'ns2:code'
+    ],
+    'okpd2' => [
+      'dir' => '/out/nsi/nsiOkpd2',
+      'prefix' => 'okpd2',
+      'class' => 'Application\Entity\Okpd2',
+      'root' => 'ns2:nsiOkpd2Data',
+      'code' => 'ns2:code'
+    ]
+  ];
 
   /**
    * PullData constructor.
@@ -100,7 +122,7 @@ class PullData
    */
   public function __construct($serviceManager, AdapterInterface $dbAdapter, FtpClient $ftp, $entityManager)
   {
-    $this->_dbAdapter = $dbAdapter;
+    $this->_db = $dbAdapter;
     $this->_sm = $serviceManager;
     $this->_ftp = $ftp;
     $this->_em = $entityManager;
@@ -117,25 +139,13 @@ class PullData
     // $this->uploadPurchasePlans();
 
     $this->_logger->log(Logger::INFO, 'Upload ' . $mode);
-    switch ($mode) {
-      case 'okpd2':
-        $console->writeLine($this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true));
-        break;
-      case 'okved2':
-        $console->writeLine($this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false));
-        break;
-      case 'okv':
-        $console->writeLine($this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false));
-        break;
-      case 'okei':
-        $console->writeLine($this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false));
-        break;
-      case 'all':
-        $console->writeLine($this->uploadNsi(self::OKPD2_DIR, self::OKPD2_PREFIX, self::OKPD2_CLASS, self::OKPD2_ROOT, self::OKPD2_CODE, true));
-        $console->writeLine($this->uploadNsi(self::OKVED2_DIR, self::OKVED2_PREFIX, self::OKVED2_CLASS, self::OKVED2_ROOT, self::OKVED2_CODE, false));
-        $console->writeLine($this->uploadNsi(self::OKV_DIR, self::OKV_PREFIX, self::OKV_CLASS, self::OKV_ROOT, self::OKV_CODE, false));
-        $console->writeLine($this->uploadNsi(self::OKEI_DIR, self::OKEI_PREFIX, self::OKEI_CLASS, self::OKEI_ROOT, self::OKEI_CODE, false));
-        break;
+
+    if ($mode === 'all') {
+      foreach ($this->directory as $d) {
+        $console->writeLine($this->uploadNsi($d, true));
+      }
+    } else {
+      $console->writeLine($this->uploadNsi($this->directory[$mode], true));
     }
 
     return true;
@@ -194,7 +204,7 @@ class PullData
    *
    * @param $tmpFile
    * @return bool|string
-   * @throws \Exception
+   * @throws RuntimeException
    */
   private function extractZip($tmpFile)
   {
@@ -210,23 +220,23 @@ class PullData
 
         if (!file_exists($dirname)) {
           if (!mkdir($dirname, 0777, true) && !is_dir($dirname)) {
-            throw new \Exception('Не могу создать каталог для сохранения', 405);
+            throw new RuntimeException('Не могу создать каталог для сохранения', 405);
           }
         }
 
         if (!is_dir($dirname) || !is_writable($dirname)) {
-          throw new \Exception('Не могу сохранять файлы', 405);
+          throw new RuntimeException('Не могу сохранять файлы', 405);
         }
 
         if (!$zip->extractTo($dirname)) {
-          throw new \Exception('Невозможно распаковать архив. ' . $zip->getStatusString());
+          throw new RuntimeException('Невозможно распаковать архив. ' . $zip->getStatusString());
         }
 
         $zip->close();
         return $dirname;
       }
 
-    } catch (Exception $e) {
+    } catch (RuntimeException $e) {
       if (file_exists($tmpFile)) {
         @unlink($tmpFile);
       }
@@ -267,25 +277,23 @@ class PullData
     return $entries;
   }
 
+
   /**
    * Обновление справочников
    *
-   * @param $dir
-   * @param $prefix
-   * @param $class
-   * @param $root
-   * @param $code
+   * @param $mode
    * @param bool $maxExecutionTime
    * @return string
    * @throws \FtpClient\FtpException
    */
-  private function uploadNsi($dir, $prefix, $class, $root, $code, $maxExecutionTime = false)
+  private function uploadNsi($mode, $maxExecutionTime = false)
   {
+
     if ($maxExecutionTime) {
       ini_set('max_execution_time', 300);
     }
 
-    $ls = $this->_ftp->nlist($dir);
+    $ls = $this->_ftp->nlist($mode['dir']);
     $name = $ls[count($ls) - 1];
     unset($ls);
 
@@ -293,40 +301,40 @@ class PullData
     $result = $logUploadFiles->findOneByName($name);
 
     if ($result) {
-      return '(' . strtoupper($prefix) . ') there are no updates.';
+      return '(' . strtoupper($mode['prefix']) . ') there are no updates.';
     }
 
-    $fileZip = $this->uploadFtpFile($name, $prefix);
+    $fileZip = $this->uploadFtpFile($name, $mode['prefix']);
     $dirname = $this->extractZip($fileZip);
     $files = $this->getDirEntries($dirname);
 
-    $nsi = $this->_em->getRepository($class);
-    $metadata = $this->_em->getClassMetadata($class);
+    $nsi = $this->_em->getRepository($mode['class']);
+    $metadata = $this->_em->getClassMetadata($mode['class']);
 
     foreach ($files as $file) {
       $xml = $this->fromFile($dirname . '/' . $file);
 
       foreach ($xml['ns2:body']['ns2:item'] as $item) {
-        if ($item[$root]['ns2:businessStatus'] === '866') {
+        if ($item[$mode['root']]['ns2:businessStatus'] === '866') {
           continue;
         }
 
-        $field = strtolower(str_replace('ns2:', '', $code));
+        $field = strtolower(str_replace('ns2:', '', $mode['code']));
         $method = 'findOneBy' . ucfirst($field);
         $nameMetadata = $metadata->fieldMappings[$field];
-        $value = $item[$root][$code];
+        $value = $item[$mode['root']][$mode['code']];
 
         if ($nameMetadata['type'] === 'integer') {
-          $value = (int)$item[$root][$code];
+          $value = (int)$item[$mode['root']][$mode['code']];
         }
 
         $row = $nsi->$method($value);
 
         if (!$row) {
-          $row = new $class($this->_em, $metadata);
+          $row = new $mode['class']($this->_em, $metadata);
         }
 
-        $row->update($item[$root]);
+        $row->update($item[$mode['root']]);
         $this->_em->persist($row);
 
         unset($row, $value);
@@ -348,7 +356,7 @@ class PullData
 
     unset($nsi, $metadata, $files);
 
-    return '(' . strtoupper($prefix) . ') update file - ' . $name;
+    return '(' . strtoupper($mode['prefix']) . ') update file - ' . $name;
   }
 
   /**
@@ -360,7 +368,7 @@ class PullData
   public function fromFile($filename)
   {
     if (!is_file($filename) || !is_readable($filename)) {
-      throw new \RuntimeException(sprintf(
+      throw new RuntimeException(sprintf(
         "File '%s' doesn't exist or not readable",
         $filename
       ));
@@ -372,7 +380,7 @@ class PullData
 
     set_error_handler(
       function ($error, $message = '') use ($filename) {
-        throw new \RuntimeException(
+        throw new RuntimeException(
           sprintf('Error reading XML file "%s": %s', $filename, $message),
           $error
         );

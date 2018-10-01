@@ -7,9 +7,8 @@ use Doctrine\DBAL\Types\Type;
 use Application\Model\EntityBase;
 
 /*
- * Переназночаем типы для PostgreSQL
+ * Переназначаем типы для PostgreSQL
  */
-
 Type::overrideType('datetime', 'Doctrine\DBAL\Types\VarDateTimeType');
 Type::overrideType('datetimetz', 'Doctrine\DBAL\Types\VarDateTimeType');
 Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
@@ -94,16 +93,6 @@ class Okv extends EntityBase
    * @ORM\Column(name="shortname", type="text", precision=0, scale=0, nullable=true, unique=false)
    */
   protected $shortname;
-
-  /**
-   * Возвращаем название класса
-   *
-   * @return string
-   */
-  public function getEntityName()
-  {
-    return $this->_entityName;
-  }
 
   /**
    * Set changedatetime.

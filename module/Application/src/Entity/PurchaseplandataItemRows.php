@@ -3,13 +3,21 @@
 namespace Application\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Type;
 use Application\Model\EntityBase;
+
+/*
+ * Переназначаем типы для PostgreSQL
+ */
+Type::overrideType('datetime', 'Doctrine\DBAL\Types\VarDateTimeType');
+Type::overrideType('datetimetz', 'Doctrine\DBAL\Types\VarDateTimeType');
+Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
 
 /**
  * PurchaseplandataItemRows
  *
  * @ORM\Table(name="purchaseplandata_item_rows", uniqueConstraints={@ORM\UniqueConstraint(name="purchaseplandata_item_rows_id_uindex", columns={"id"})}, indexes={@ORM\Index(name="IDX_F5519FF56F8C53D8", columns={"okved2"}), @ORM\Index(name="IDX_F5519FF5ACD0F0F0", columns={"okpd2"}), @ORM\Index(name="IDX_F5519FF52A675A96", columns={"okei"}), @ORM\Index(name="IDX_F5519FF5F9E23AB3", columns={"planitemid"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Application\Model\EntityBase")
  */
 class PurchaseplandataItemRows extends EntityBase
 {
@@ -21,28 +29,28 @@ class PurchaseplandataItemRows extends EntityBase
    * @ORM\GeneratedValue(strategy="SEQUENCE")
    * @ORM\SequenceGenerator(sequenceName="purchaseplandata_item_rows_id_seq", allocationSize=1, initialValue=1)
    */
-  private $id;
+  protected $id;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="guid", type="guid", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $guid;
+  protected $guid;
 
   /**
    * @var int|null
    *
    * @ORM\Column(name="ordinalnumber", type="integer", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $ordinalnumber;
+  protected $ordinalnumber;
 
   /**
    * @var int|null
    *
    * @ORM\Column(name="qty", type="integer", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $qty;
+  protected $qty;
 
   /**
    * @var \Application\Entity\Okved2
@@ -52,7 +60,7 @@ class PurchaseplandataItemRows extends EntityBase
    *   @ORM\JoinColumn(name="okved2", referencedColumnName="id", nullable=true)
    * })
    */
-  private $okved2;
+  protected $okved2;
 
   /**
    * @var \Application\Entity\Okpd2
@@ -62,7 +70,7 @@ class PurchaseplandataItemRows extends EntityBase
    *   @ORM\JoinColumn(name="okpd2", referencedColumnName="id", nullable=true)
    * })
    */
-  private $okpd2;
+  protected $okpd2;
 
   /**
    * @var \Application\Entity\Okei
@@ -72,7 +80,7 @@ class PurchaseplandataItemRows extends EntityBase
    *   @ORM\JoinColumn(name="okei", referencedColumnName="id", nullable=true)
    * })
    */
-  private $okei;
+  protected $okei;
 
   /**
    * @var \Application\Entity\PurchasePlanItems
@@ -82,99 +90,7 @@ class PurchaseplandataItemRows extends EntityBase
    *   @ORM\JoinColumn(name="planitemid", referencedColumnName="id", nullable=true)
    * })
    */
-  private $planitemid;
-
-  /**
-   * Возвращаем название класса
-   *
-   * @return string
-   */
-  public function getEntityName()
-  {
-    return 'PurchaseplandataItemRows';
-  }
-
-  /**
-   * Get id.
-   *
-   * @return int
-   */
-  public function getId()
-  {
-    return $this->id;
-  }
-
-  /**
-   * Set guid.
-   *
-   * @param string|null $guid
-   *
-   * @return PurchaseplandataItemRows
-   */
-  public function setGuid($guid = null)
-  {
-    $this->guid = $guid;
-
-    return $this;
-  }
-
-  /**
-   * Get guid.
-   *
-   * @return string|null
-   */
-  public function getGuid()
-  {
-    return $this->guid;
-  }
-
-  /**
-   * Set ordinalnumber.
-   *
-   * @param int|null $ordinalnumber
-   *
-   * @return PurchaseplandataItemRows
-   */
-  public function setOrdinalnumber($ordinalnumber = null)
-  {
-    $this->ordinalnumber = $ordinalnumber;
-
-    return $this;
-  }
-
-  /**
-   * Get ordinalnumber.
-   *
-   * @return int|null
-   */
-  public function getOrdinalnumber()
-  {
-    return $this->ordinalnumber;
-  }
-
-  /**
-   * Set qty.
-   *
-   * @param int|null $qty
-   *
-   * @return PurchaseplandataItemRows
-   */
-  public function setQty($qty = null)
-  {
-    $this->qty = $qty;
-
-    return $this;
-  }
-
-  /**
-   * Get qty.
-   *
-   * @return int|null
-   */
-  public function getQty()
-  {
-    return $this->qty;
-  }
+  protected $planitemid;
 
   /**
    * Set okved2.
@@ -188,16 +104,6 @@ class PurchaseplandataItemRows extends EntityBase
     $this->okved2 = $okved2;
 
     return $this;
-  }
-
-  /**
-   * Get okved2.
-   *
-   * @return \Application\Entity\Okved2|null
-   */
-  public function getOkved2()
-  {
-    return $this->okved2;
   }
 
   /**
@@ -215,16 +121,6 @@ class PurchaseplandataItemRows extends EntityBase
   }
 
   /**
-   * Get okpd2.
-   *
-   * @return \Application\Entity\Okpd2|null
-   */
-  public function getOkpd2()
-  {
-    return $this->okpd2;
-  }
-
-  /**
    * Set okei.
    *
    * @param \Application\Entity\Okei|null $okei
@@ -236,16 +132,6 @@ class PurchaseplandataItemRows extends EntityBase
     $this->okei = $okei;
 
     return $this;
-  }
-
-  /**
-   * Get okei.
-   *
-   * @return \Application\Entity\Okei|null
-   */
-  public function getOkei()
-  {
-    return $this->okei;
   }
 
   /**
@@ -262,13 +148,4 @@ class PurchaseplandataItemRows extends EntityBase
     return $this;
   }
 
-  /**
-   * Get planitemid.
-   *
-   * @return \Application\Entity\PurchasePlanItems|null
-   */
-  public function getPlanitemid()
-  {
-    return $this->planitemid;
-  }
 }

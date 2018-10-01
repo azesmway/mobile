@@ -7,9 +7,8 @@ use Doctrine\DBAL\Types\Type;
 use Application\Model\EntityBase;
 
 /*
- * Переназночаем типы для PostgreSQL
+ * Переназначаем типы для PostgreSQL
  */
-
 Type::overrideType('datetime', 'Doctrine\DBAL\Types\VarDateTimeType');
 Type::overrideType('datetimetz', 'Doctrine\DBAL\Types\VarDateTimeType');
 Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
@@ -18,7 +17,7 @@ Type::overrideType('time', 'Doctrine\DBAL\Types\VarDateTimeType');
  * Okv
  *
  * @ORM\Table(name="log_upload_files", uniqueConstraints={@ORM\UniqueConstraint(name="log_upload_files_id_uindex", columns={"id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Application\Model\EntityBase")
  */
 class LogUploadFiles extends EntityBase
 {
@@ -30,41 +29,21 @@ class LogUploadFiles extends EntityBase
    * @ORM\GeneratedValue(strategy="SEQUENCE")
    * @ORM\SequenceGenerator(sequenceName="log_upload_files_id_seq", allocationSize=1, initialValue=1)
    */
-  private $id;
+  protected $id;
 
   /**
    * @var \DateTime|null
    *
    * @ORM\Column(name="dateupdate", type="datetimetz", precision=0, scale=0, nullable=true, unique=false)
    */
-  private $dateupdate;
+  protected $dateupdate;
 
   /**
    * @var string|null
    *
    * @ORM\Column(name="name", type="string", length=255, precision=0, scale=0, nullable=true, unique=false)
    */
-  private $name;
-
-  /**
-   * Возвращаем название класса
-   *
-   * @return string
-   */
-  public function getEntityName()
-  {
-    return 'LogUploadFiles';
-  }
-
-  /**
-   * Get id.
-   *
-   * @return int
-   */
-  public function getId()
-  {
-    return $this->id;
-  }
+  protected $name;
 
   /**
    * Set dateupdate.
@@ -82,40 +61,6 @@ class LogUploadFiles extends EntityBase
     $this->dateupdate = $dateupdate;
 
     return $this;
-  }
-
-  /**
-   * Get changedatetime.
-   *
-   * @return \DateTime|null
-   */
-  public function getDateupdate()
-  {
-    return $this->dateupdate;
-  }
-
-  /**
-   * Set name.
-   *
-   * @param string|null $name
-   *
-   * @return LogUploadFiles
-   */
-  public function setName($name = null)
-  {
-    $this->name = $name;
-
-    return $this;
-  }
-
-  /**
-   * Get name.
-   *
-   * @return string|null
-   */
-  public function getName()
-  {
-    return $this->name;
   }
 
 }

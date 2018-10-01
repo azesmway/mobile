@@ -17,6 +17,15 @@ class EntityBase extends EntityRepository
 {
 
   /**
+   * Справочник где есть секции или группы
+   *
+   * @var array
+   */
+  protected $_isSectionOrGroup = [
+    'Application\Entity\Okei'
+  ];
+
+  /**
    * @param string $method
    * @param array $arguments
    * @return EntityBase|mixed|null
@@ -94,7 +103,7 @@ class EntityBase extends EntityRepository
     foreach ($entity as $name => $val) {
       $ind = strtolower(str_replace('ns2:', '', $name));
 
-      if ($this->getEntityName() === 'Application\Entity\Okei' && ($ind === 'section' || $ind === 'group')) {
+      if (in_array($this->getEntityName(), $this->_isSectionOrGroup) && ($ind === 'section' || $ind === 'group')) {
         $fun = 'set' . ucfirst($ind . 'code');
         $this->$fun($entity[$name]['ns2:code']);
 
@@ -168,7 +177,6 @@ class EntityBase extends EntityRepository
    * @param $planitems
    */
   public function updatePlanItems($items) {
-
     foreach ($items as $data) {
       if (!empty($data[0])) {
         foreach ($data as $row) {

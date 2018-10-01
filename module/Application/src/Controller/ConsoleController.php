@@ -16,20 +16,32 @@ use Application\Model\PullData;
 
 class ConsoleController extends AbstractActionController
 {
+
   private $_console;
   private $_eisPullData;
 
+  /**
+   * ConsoleController constructor.
+   * @param Console $console
+   * @param PullData $eisPullData
+   */
   public function __construct(Console $console, PullData $eisPullData)
   {
     $this->_console = $console;
     $this->_eisPullData = $eisPullData;
   }
 
+  /**
+   * @return Console
+   */
   private function getConsole()
   {
     return $this->_console;
   }
 
+  /**
+   * @return mixed
+   */
   public function updateDirectoryAction()
   {
     $request = $this->getRequest();
@@ -38,7 +50,7 @@ class ConsoleController extends AbstractActionController
       throw new RuntimeException('You can only use this action from a console!');
     }
 
-    $typeDirectory = $request->getParam('typeDirectory', 'all');
+    $typeDirectory = strtolower($request->getParam('typeDirectory', 'all'));
     $this->getConsole()->writeLine("Starting update...");
 
     $result = $this->_eisPullData->run($typeDirectory, $this->getConsole());
