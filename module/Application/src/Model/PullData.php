@@ -328,6 +328,8 @@ class PullData
 
         $row->update($item[$root]);
         $this->_em->persist($row);
+
+        unset($row, $value);
       }
 
       if (is_file($dirname . '/' . $file)) {
@@ -343,6 +345,8 @@ class PullData
     if (is_file($fileZip)) {
       @unlink($fileZip);
     }
+
+    unset($nsi, $metadata, $files);
 
     return '(' . strtoupper($prefix) . ') update file - ' . $name;
   }

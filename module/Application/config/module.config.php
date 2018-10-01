@@ -78,12 +78,10 @@ return [
     'factories' => [
       Model\EISMobile::class => Factory\EISMobileFactory::class,
       Model\PullData::class => Factory\PullDataFactory::class,
-      Model\EntityBase::class => Factory\EntityBaseFactory::class
     ],
     'aliases' => [
       'eis' => Model\EISMobile::class,
       'pull' => Model\PullData::class,
-      'base' => Model\EntityBase::class,
     ],
     'abstract_factories' => [
       'Zend\Log\LoggerAbstractServiceFactory',
