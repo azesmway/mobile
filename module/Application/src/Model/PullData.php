@@ -21,11 +21,29 @@ use RuntimeException;
 class PullData
 {
 
+  /**
+   * @var AdapterInterface
+   */
   private $_db;
+
+  /**
+   * @var ServiceManager
+   */
   private $_sm;
+
+  /**
+   * @var FtpClient
+   */
   private $_ftp;
+
+  /**
+   * @var Doctrine Entitymanager
+   */
   private $_em;
 
+  /**
+   * @var XMLReader
+   */
   private $_reader;
 
   /**

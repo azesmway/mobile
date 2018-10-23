@@ -15,6 +15,12 @@ use Application\Model\PullData;
 
 class ConsoleControllerFactory implements FactoryInterface {
 
+  /**
+   * @param ContainerInterface $container
+   * @param $requestedName
+   * @param array|null $options
+   * @return ConsoleController|object
+   */
   public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
   {
     return new ConsoleController($container->get('console'), $container->get(PullData::class));

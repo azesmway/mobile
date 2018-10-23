@@ -195,7 +195,7 @@ class EntityBase extends EntityRepository
   }
 
   /**
-   * Обновление по каждой позиции
+   * Обновление по каждой позиции плана
    *
    * @param $item
    */

@@ -17,7 +17,16 @@ use Application\Model\PullData;
 class ConsoleController extends AbstractActionController
 {
 
+  /**
+   * Консоль
+   * @var Console
+   */
   private $_console;
+
+  /**
+   * Обработка данных с еис
+   * @var PullData
+   */
   private $_eisPullData;
 
   /**
@@ -40,6 +49,7 @@ class ConsoleController extends AbstractActionController
   }
 
   /**
+   * Обновление справочников из консоли
    * @return mixed
    */
   public function updateDirectoryAction()

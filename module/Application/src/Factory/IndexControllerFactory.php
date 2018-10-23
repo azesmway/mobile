@@ -14,6 +14,12 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 
 class IndexControllerFactory implements FactoryInterface {
 
+  /**
+   * @param ContainerInterface $container
+   * @param $requestedName
+   * @param array|null $options
+   * @return IndexController|object
+   */
   public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
   {
     $controllerPluginManager = $container;

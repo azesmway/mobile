@@ -16,7 +16,11 @@ use Application\Model\EISMobile;
 class ApiController extends AuthController
 {
 
-  private $eisMobile;
+  /**
+   * Основное приложение
+   * @var EISMobile
+   */
+  private $_eisMobile;
 
   /**
    * ApiController constructor.
@@ -26,7 +30,7 @@ class ApiController extends AuthController
    */
   public function __construct($serverFactory, UserIdProviderInterface $userIdProvider, EISMobile $eisMobile) {
     parent::__construct($serverFactory, $userIdProvider);
-    $this->eisMobile = $eisMobile;
+    $this->_eisMobile = $eisMobile;
   }
 
   /**
@@ -44,7 +48,7 @@ class ApiController extends AuthController
     $requestPost = $this->getRequest()->getPost()->toArray();
     $requestContent = json_decode($this->getRequest()->getContent(), true);
 
-    $result = $this->eisMobile->run($requestGet, $requestPost, $requestContent);
+    $result = $this->_eisMobile->run($requestGet, $requestPost, $requestContent);
 
     return $this->getReturnResponse($result);
 

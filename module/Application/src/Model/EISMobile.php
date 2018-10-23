@@ -11,13 +11,25 @@ namespace Application\Model;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Sql\Select;
+use Zend\ServiceManager;
 
 class EISMobile
 {
 
-  private $dbAdapter;
-  private $serviceManager;
-  private $pluginManager;
+  /**
+   * @var AdapterInterface
+   */
+  private $_db;
+
+  /**
+   * @var ServiceManager
+   */
+  private $_sm;
+
+  /**
+   * @var PluginManager
+   */
+  private $_pm;
 
   /**
    * EISMobile constructor.
@@ -26,9 +38,9 @@ class EISMobile
    * @param AdapterInterface $dbAdapter
    */
   public function __construct($controllerPluginManager, $serviceManager, AdapterInterface $dbAdapter) {
-    $this->dbAdapter = $dbAdapter;
-    $this->serviceManager = $serviceManager;
-    $this->pluginManager = $controllerPluginManager;
+    $this->_db = $dbAdapter;
+    $this->_sm = $serviceManager;
+    $this->_pm = $controllerPluginManager;
   }
 
   /**
@@ -42,7 +54,7 @@ class EISMobile
   public function run($requestGet = null, $requestPost = null, $requestContent = null) {
 
     // ---> Пока для теста, работа с таблицей
-    $tableGateway = new TableGateway('oauth_access_tokens', $this->dbAdapter);
+    $tableGateway = new TableGateway('oauth_access_tokens', $this->_db);
 
     $resultSet = $tableGateway->select(function (Select $select) {
       $select->order(array('expires asc'));
@@ -51,7 +63,7 @@ class EISMobile
     // <----
 
     // тест на получение класса и работа с ним
-    $pullData = $this->pluginManager->get('pull');
+    $pullData = $this->_pm->get('pull');
     $res = $pullData->run();
 
     return ['success' => true, 'message' => 'You accessed my APIs! Поздравляю!'];

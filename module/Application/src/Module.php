@@ -11,6 +11,9 @@ use Zend\Mvc\MvcEvent;
 
 class Module
 {
+  /**
+   * Версия проекта
+   */
   const VERSION = '0.0.1-dev';
 
   public function getConfig()

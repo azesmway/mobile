@@ -25,6 +25,7 @@ class IndexController extends AuthController
   }
 
   /**
+   * Вход чере браузер
    * @return \Zend\Stdlib\ResponseInterface|\Zend\View\Model\ViewModel|\ZF\ApiProblem\ApiProblemResponse
    */
   public function indexAction()
