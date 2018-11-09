@@ -1,6 +1,6 @@
 {
-    "name": "zendframework/skeleton-application",
-    "description": "Skeleton Application for Zend Framework zend-mvc applications",
+    "name": "Mobile-application",
+    "description": "Mobile Application for Zend Framework zend-mvc applications",
     "type": "project",
     "license": "BSD-3-Clause",
     "keywords": [
@@ -8,7 +8,7 @@
         "mvc",
         "zf"
     ],
-    "homepage": "http://framework.zend.com/",
+    "homepage": "http://eis-gov.ru/",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
