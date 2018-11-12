@@ -14,6 +14,6 @@
 return [
   'db' => [
     'driver' => 'Pdo_Pgsql',
-    'dsn'    => 'pgsql:dbname=mobile;host=localhost;port=5433',
+    'dsn'    => 'pgsql:dbname=mobile;host=localhost;port=5432',
   ]
 ];

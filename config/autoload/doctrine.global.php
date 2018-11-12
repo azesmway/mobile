@@ -16,7 +16,7 @@ return [
         'driverClass' => PDOPgSqlDriver::class,
         'params' => [
           'host' => 'localhost',
-          'port' => '5433',
+          'port' => '5432',
           'dbname' => 'mobile',
         ],
       ],
